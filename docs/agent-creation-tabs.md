@@ -2,7 +2,7 @@
 
 This guide walks you through each tab in the agent workspace so you can configure a new agent step by step.
 
-For an in-app walkthrough, click the **Help** button in the footer to launch an interactive guide.
+Click **Create New Agent** to launch an interactive walkthrough that guides you through the tabs. After finishing the guide, you'll be taken to the agent workspace.
 
 ## Metadata
 Provide the agent name, a short description, and select the dataset type that the agent will work with.

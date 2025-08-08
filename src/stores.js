@@ -28,7 +28,7 @@ export function createNewAgent() {
   const newAgent = { id, name: 'New Agent', description: '', status: 'Draft' };
   agents.update(a => [...a, newAgent]);
   currentAgent.set(newAgent);
-  currentView.set('workspace');
+  currentView.set('guide');
 }
 
 export function openAgent(agent) {

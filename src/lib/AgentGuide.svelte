@@ -1,5 +1,7 @@
 <script>
-  import { currentView } from '../stores.js';
+  import { currentView, currentAgent } from '../stores.js';
+  import { get } from 'svelte/store';
+                                                 
   let step = 0;
   const steps = [
     {
@@ -37,7 +39,14 @@
   ];
   function next() { if (step < steps.length - 1) step++; }
   function prev() { if (step > 0) step--; }
-  function finish() { currentView.set('home'); }
+
+  function finish() {
+    if (get(currentAgent)) {
+      currentView.set('workspace');
+    } else {
+      currentView.set('home');
+    }
+  }
 </script>
 
 <div class="p-8 max-w-2xl mx-auto">
