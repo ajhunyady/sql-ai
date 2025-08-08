@@ -7,7 +7,9 @@
 
 <div class="flex flex-col h-screen">
   <header class="flex items-center p-4 border-b">
-    <div class="font-bold">Agent Builder</div>
+    <button type="button" on:click={() => currentView.set('home')}>
+      <img src="/coagent-logo.svg" alt="CoAgent" class="h-8" />
+    </button>
     <input type="text" placeholder="Search" class="border p-1 rounded flex-1 mx-4" />
     <div class="rounded-full bg-gray-300 w-8 h-8"></div>
   </header>
