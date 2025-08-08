@@ -1,6 +1,7 @@
 <script>
   import Home from './lib/Home.svelte';
   import AgentWorkspace from './lib/AgentWorkspace.svelte';
+  import AgentGuide from './lib/AgentGuide.svelte';
   import { agents, currentView, createNewAgent, openAgent } from './stores.js';
 </script>
 
@@ -38,13 +39,15 @@
     <main class="flex-1 overflow-y-auto">
       {#if $currentView === 'home'}
         <Home />
+      {:else if $currentView === 'guide'}
+        <AgentGuide />
       {:else}
         <AgentWorkspace />
       {/if}
     </main>
     <footer class="p-4 border-t text-sm text-gray-500 flex justify-between">
       <div>Version 0.1</div>
-      <a href="/" class="text-blue-500">Help</a>
+      <button class="text-blue-500" on:click={() => currentView.set('guide')}>Help</button>
     </footer>
   </div>
 </div>
