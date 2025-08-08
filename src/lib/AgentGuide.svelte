@@ -1,6 +1,7 @@
 <script>
   import { currentView, currentAgent } from '../stores.js';
   import { get } from 'svelte/store';
+                                                 
   let step = 0;
   const steps = [
     {
@@ -38,6 +39,7 @@
   ];
   function next() { if (step < steps.length - 1) step++; }
   function prev() { if (step > 0) step--; }
+
   function finish() {
     if (get(currentAgent)) {
       currentView.set('workspace');
