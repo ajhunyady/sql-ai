@@ -7,6 +7,7 @@
   import TestingTab from './tabs/TestingTab.svelte';
   import EvaluationsTab from './tabs/EvaluationsTab.svelte';
   import MonitoringTab from './tabs/MonitoringTab.svelte';
+  import SettingsTab from './tabs/SettingsTab.svelte';
 
   let activeTab = 'Metadata';
 
@@ -17,7 +18,8 @@
     { name: 'Querying Guidance', component: QueryingGuidanceTab, required: false },
     { name: 'Testing', component: TestingTab, required: false },
     { name: 'Evaluations', component: EvaluationsTab, required: false },
-    { name: 'Monitoring', component: MonitoringTab, required: false }
+    { name: 'Monitoring', component: MonitoringTab, required: false },
+    { name: 'Settings', component: SettingsTab, required: false }
   ];
 </script>
 
@@ -60,6 +62,8 @@
           <EvaluationsTab />
         {:else if activeTab === 'Monitoring'}
           <MonitoringTab />
+        {:else if activeTab === 'Settings'}
+          <SettingsTab />
         {/if}
       </div>
       <aside class="w-64 border-l p-4 hidden md:block">
