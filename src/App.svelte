@@ -1,7 +1,7 @@
 <script>
   import Home from './lib/Home.svelte';
   import AgentWorkspace from './lib/AgentWorkspace.svelte';
-  import { agents, currentView, currentAgent, createNewAgent, openAgent, deleteAgent } from './stores.js';
+  import { agents, currentView, createNewAgent, openAgent } from './stores.js';
 </script>
 
 <div class="flex h-screen">
@@ -19,12 +19,6 @@
               on:click={() => openAgent(agent)}
             >
               {agent.name}
-            </button>
-            <button
-              class="ml-2 text-red-500 hover:text-red-700"
-              on:click={() => deleteAgent(agent)}
-            >
-              &times;
             </button>
           </li>
         {/each}
