@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 
 export const agents = writable([
   { id: 1, name: 'Agent 1', description: 'Description', status: 'Active' },
@@ -19,4 +19,13 @@ export function createNewAgent() {
 export function openAgent(agent) {
   currentAgent.set(agent);
   currentView.set('workspace');
+}
+
+export function deleteAgent(agent) {
+  agents.update(a => a.filter(x => x.id !== agent.id));
+  const curr = get(currentAgent);
+  if (curr && curr.id === agent.id) {
+    currentAgent.set(null);
+    currentView.set('home');
+  }
 }
