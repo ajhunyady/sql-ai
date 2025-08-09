@@ -2,7 +2,7 @@
 
 This guide walks you through each tab in the agent workspace so you can configure a new agent step by step.
 
-Click **Create New Agent** to launch a step-by-step wizard that presents each configuration screen. After finishing, you'll be taken to the agent workspace.
+Click **New Agent** to launch a step-by-step wizard that presents each configuration screen. After finishing, you'll be taken to the agent workspace.
 
 ## Metadata
 Provide the agent name, a short description, and select the dataset type that the agent will work with.
