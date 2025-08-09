@@ -1,5 +1,6 @@
 <script>
   import { agents, createNewAgent, openAgent } from '../stores.js';
+  import AgentTile from './AgentTile.svelte';
 </script>
 
 <div class="p-8">
@@ -25,14 +26,7 @@
   <h2 class="text-xl mb-2">Recent Agents</h2>
   <div class="grid grid-cols-2 gap-4">
     {#each $agents as agent}
-      <button
-        class="border p-4 rounded hover:bg-gray-50 text-left"
-        on:click={() => openAgent(agent)}
-      >
-        <h3 class="font-semibold">{agent.name}</h3>
-        <p class="text-sm">{agent.description}</p>
-        <p class="text-xs text-gray-500">Status: {agent.status}</p>
-      </button>
+      <AgentTile {agent} on:click={() => openAgent(agent)} />
     {/each}
   </div>
 </div>
