@@ -1,8 +1,15 @@
 import { writable, get } from 'svelte/store';
 
+function generateId(length = 64) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return Array.from(array, x => chars[x % chars.length]).join('');
+}
+
 let initialAgents = [
-  { id: 1, name: 'Agent 1', description: 'Description', status: 'Active' },
-  { id: 2, name: 'Agent 2', description: 'Description', status: 'Draft' }
+  { id: generateId(), name: 'Agent 1', description: 'Description', status: 'Active' },
+  { id: generateId(), name: 'Agent 2', description: 'Description', status: 'Draft' }
 ];
 
 if (typeof localStorage !== 'undefined') {
@@ -24,7 +31,7 @@ export const currentView = writable('home');
 export const currentAgent = writable(null);
 
 export function createNewAgent() {
-  const id = Date.now();
+  const id = generateId();
   const newAgent = { id, name: 'New Agent', description: '', status: 'Draft' };
   agents.update(a => [...a, newAgent]);
   currentAgent.set(newAgent);
