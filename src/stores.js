@@ -86,7 +86,7 @@ if (typeof window !== 'undefined') {
     const view = get(currentView);
     const agent = get(currentAgent);
     const path = pathFromState(view, agent);
-    if (window.location.pathname !== path || window.location.hash) {
+    if (window.location.pathname !== path) {
       history.pushState({}, '', path);
     }
   };
