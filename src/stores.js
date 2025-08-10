@@ -1,8 +1,16 @@
 import { writable, get } from 'svelte/store';
 
+function generateAgentId() {
+  const unique =
+    typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2, 10);
+  return `/agent/${unique}`;
+}
+
 let initialAgents = [
-  { id: 1, name: 'Agent 1', description: 'Description', status: 'Active' },
-  { id: 2, name: 'Agent 2', description: 'Description', status: 'Draft' }
+  { id: generateAgentId(), name: 'Agent 1', description: 'Description', status: 'Active' },
+  { id: generateAgentId(), name: 'Agent 2', description: 'Description', status: 'Draft' }
 ];
 
 if (typeof localStorage !== 'undefined') {
@@ -24,16 +32,22 @@ export const currentView = writable('home');
 export const currentAgent = writable(null);
 
 export function createNewAgent() {
-  const id = Date.now();
+  const id = generateAgentId();
   const newAgent = { id, name: 'New Agent', description: '', status: 'Draft' };
   agents.update(a => [...a, newAgent]);
   currentAgent.set(newAgent);
   currentView.set('guide');
+  if (typeof window !== 'undefined') {
+    window.location.hash = id;
+  }
 }
 
 export function openAgent(agent) {
   currentAgent.set(agent);
   currentView.set('workspace');
+  if (typeof window !== 'undefined') {
+    window.location.hash = agent.id;
+  }
 }
 
 export function deleteAgent(agent) {
@@ -42,5 +56,28 @@ export function deleteAgent(agent) {
   if (curr && curr.id === agent.id) {
     currentAgent.set(null);
     currentView.set('home');
+    if (typeof window !== 'undefined') {
+      window.location.hash = '';
+    }
   }
+}
+
+function handleHashChange() {
+  if (typeof window === 'undefined') return;
+  const hash = window.location.hash.slice(1); // remove '#'
+  const agent = get(agents).find(a => a.id === hash);
+  if (agent) {
+    currentAgent.set(agent);
+    if (get(currentView) !== 'guide') {
+      currentView.set('workspace');
+    }
+  } else {
+    currentAgent.set(null);
+    currentView.set('home');
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('hashchange', handleHashChange);
+  handleHashChange();
 }

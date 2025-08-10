@@ -35,6 +35,9 @@
       currentView.set('workspace');
     } else {
       currentView.set('home');
+      if (typeof window !== 'undefined') {
+        window.location.hash = '';
+      }
     }
   }
 </script>
