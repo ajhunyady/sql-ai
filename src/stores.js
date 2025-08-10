@@ -1,5 +1,9 @@
 import { writable, get } from 'svelte/store';
 
+function sortAgents(list) {
+  return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+}
+
 function generateAgentId() {
   const unique =
     typeof crypto !== 'undefined' && crypto.randomUUID
@@ -9,16 +13,33 @@ function generateAgentId() {
 }
 
 let initialAgents = [
-  { id: generateAgentId(), name: 'Agent 1', description: 'Description', status: 'Active' },
-  { id: generateAgentId(), name: 'Agent 2', description: 'Description', status: 'Draft' }
+  {
+    id: generateAgentId(),
+    name: 'Agent 1',
+    description: 'Description',
+    status: 'Active',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: generateAgentId(),
+    name: 'Agent 2',
+    description: 'Description',
+    status: 'Draft',
+    createdAt: new Date().toISOString()
+  }
 ];
 
 if (typeof localStorage !== 'undefined') {
   const stored = localStorage.getItem('agents');
   if (stored) {
-    initialAgents = JSON.parse(stored);
+    initialAgents = JSON.parse(stored).map(a => ({
+      ...a,
+      createdAt: a.createdAt || new Date().toISOString()
+    }));
   }
 }
+
+initialAgents = sortAgents(initialAgents);
 
 export const agents = writable(initialAgents);
 
@@ -39,8 +60,14 @@ export function setPath(path) {
 
 export function createNewAgent() {
   const id = generateAgentId();
-  const newAgent = { id, name: 'New Agent', description: '', status: 'Draft' };
-  agents.update(a => [...a, newAgent]);
+  const newAgent = {
+    id,
+    name: 'New Agent',
+    description: '',
+    status: 'Draft',
+    createdAt: new Date().toISOString()
+  };
+  agents.update(a => sortAgents([...a, newAgent]));
   currentAgent.set(newAgent);
   currentView.set('guide');
   setPath(id);
@@ -53,7 +80,7 @@ export function openAgent(agent) {
 }
 
 export function deleteAgent(agent) {
-  agents.update(a => a.filter(x => x.id !== agent.id));
+  agents.update(a => sortAgents(a.filter(x => x.id !== agent.id)));
   const curr = get(currentAgent);
   if (curr && curr.id === agent.id) {
     currentAgent.set(null);
