@@ -51,3 +51,52 @@ export function deleteAgent(agent) {
     currentView.set('home');
   }
 }
+
+function pathFromState(view, agent) {
+  if (view === 'guide') return '/guide';
+  if (view === 'workspace' && agent) return `/agent/${agent.id}`;
+  return '/';
+}
+
+if (typeof window !== 'undefined') {
+  const parsePath = () => {
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    if (parts[0] === 'agent' && parts[1]) {
+      const agent = get(agents).find(a => a.id === parts[1]);
+      if (agent) {
+        currentAgent.set(agent);
+        currentView.set('workspace');
+        return;
+      }
+    } else if (parts[0] === 'guide') {
+      currentAgent.set(null);
+      currentView.set('guide');
+      return;
+    }
+    currentAgent.set(null);
+    currentView.set('home');
+  };
+
+  let suppress = true;
+  parsePath();
+  suppress = false;
+
+  const sync = () => {
+    if (suppress) return;
+    const view = get(currentView);
+    const agent = get(currentAgent);
+    const path = pathFromState(view, agent);
+    if (window.location.pathname !== path) {
+      history.pushState({}, '', path);
+    }
+  };
+
+  currentView.subscribe(sync);
+  currentAgent.subscribe(sync);
+
+  window.addEventListener('popstate', () => {
+    suppress = true;
+    parsePath();
+    suppress = false;
+  });
+}
