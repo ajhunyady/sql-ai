@@ -61,23 +61,3 @@ export function deleteAgent(agent) {
     }
   }
 }
-
-function handleHashChange() {
-  if (typeof window === 'undefined') return;
-  const hash = window.location.hash.slice(1); // remove '#'
-  const agent = get(agents).find(a => a.id === hash);
-  if (agent) {
-    currentAgent.set(agent);
-    if (get(currentView) !== 'guide') {
-      currentView.set('workspace');
-    }
-  } else {
-    currentAgent.set(null);
-    currentView.set('home');
-  }
-}
-
-if (typeof window !== 'undefined') {
-  window.addEventListener('hashchange', handleHashChange);
-  handleHashChange();
-}
