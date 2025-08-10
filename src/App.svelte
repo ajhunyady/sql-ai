@@ -10,8 +10,7 @@
     <button type="button" on:click={() => currentView.set('home')}>
       <img src="/coagent-logo.svg" alt="CoAgent" class="h-8" />
     </button>
-    <input type="text" placeholder="Search" class="border p-1 rounded flex-1 mx-4" />
-    <div class="rounded-full bg-gray-300 w-8 h-8"></div>
+    <div class="rounded-full bg-gray-300 w-8 h-8 ml-auto"></div>
   </header>
   <main class="flex-1 overflow-y-auto">
     {#if $currentView === 'home'}
