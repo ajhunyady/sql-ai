@@ -24,7 +24,7 @@
     </button>
   </div>
   <h2 class="text-xl mb-2">Recent Agents</h2>
-  <div class="grid grid-cols-2 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     {#each $agents as agent}
       <AgentTile {agent} on:click={() => openAgent(agent)} />
     {/each}
