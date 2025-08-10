@@ -7,7 +7,7 @@ let uuidQueue;
 beforeEach(() => {
   vi.resetModules();
   vi.unstubAllGlobals();
-  window.location.hash = '';
+  window.history.replaceState({}, '', '/');
   localStorage.clear();
   uuidQueue = ['init-1', 'init-2', 'new-1', 'new-2'];
   vi.stubGlobal('crypto', {
@@ -32,17 +32,17 @@ describe('agent store', () => {
     expect(ids[0]).not.toBe(ids[1]);
   });
 
-  it('updates current agent and view based on hash', async () => {
+  it('updates current agent and view based on path', async () => {
     const { agents, currentAgent, currentView } = await import('./stores.js');
     const existing = get(agents)[0];
 
-    window.location.hash = existing.id;
-    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    window.history.pushState({}, '', existing.id);
+    window.dispatchEvent(new PopStateEvent('popstate'));
     expect(get(currentAgent)).toEqual(existing);
     expect(get(currentView)).toBe('workspace');
 
-    window.location.hash = '/agent/invalid';
-    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    window.history.pushState({}, '', '/agent/invalid');
+    window.dispatchEvent(new PopStateEvent('popstate'));
     expect(get(currentAgent)).toBeNull();
     expect(get(currentView)).toBe('home');
   });

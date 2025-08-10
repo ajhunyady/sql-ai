@@ -2,7 +2,7 @@
   import Home from './lib/Home.svelte';
   import AgentWorkspace from './lib/AgentWorkspace.svelte';
   import AgentGuide from './lib/AgentGuide.svelte';
-  import { currentView } from './stores.js';
+  import { currentView, currentAgent, setPath } from './stores.js';
 </script>
 
 <div class="flex flex-col h-screen">
@@ -11,9 +11,8 @@
       type="button"
       on:click={() => {
         currentView.set('home');
-        if (typeof window !== 'undefined') {
-          window.location.hash = '';
-        }
+        currentAgent.set(null);
+        setPath('/');
       }}
     >
       <img src="/coagent-logo.svg" alt="CoAgent" class="h-8" />
