@@ -31,23 +31,25 @@ if (typeof localStorage !== 'undefined') {
 export const currentView = writable('home');
 export const currentAgent = writable(null);
 
+export function setPath(path) {
+  if (typeof window !== 'undefined') {
+    window.history.pushState({}, '', path);
+  }
+}
+
 export function createNewAgent() {
   const id = generateAgentId();
   const newAgent = { id, name: 'New Agent', description: '', status: 'Draft' };
   agents.update(a => [...a, newAgent]);
   currentAgent.set(newAgent);
   currentView.set('guide');
-  if (typeof window !== 'undefined') {
-    window.location.hash = id;
-  }
+  setPath(id);
 }
 
 export function openAgent(agent) {
   currentAgent.set(agent);
   currentView.set('workspace');
-  if (typeof window !== 'undefined') {
-    window.location.hash = agent.id;
-  }
+  setPath(agent.id);
 }
 
 export function deleteAgent(agent) {
@@ -56,8 +58,26 @@ export function deleteAgent(agent) {
   if (curr && curr.id === agent.id) {
     currentAgent.set(null);
     currentView.set('home');
-    if (typeof window !== 'undefined') {
-      window.location.hash = '';
-    }
+    setPath('/');
   }
+}
+
+function handleRoute() {
+  if (typeof window === 'undefined') return;
+  const path = window.location.pathname;
+  const agent = get(agents).find(a => a.id === path);
+  if (agent) {
+    currentAgent.set(agent);
+    if (get(currentView) !== 'guide') {
+      currentView.set('workspace');
+    }
+  } else {
+    currentAgent.set(null);
+    currentView.set('home');
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('popstate', handleRoute);
+  handleRoute();
 }
