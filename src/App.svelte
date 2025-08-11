@@ -32,7 +32,8 @@
   </aside>
   <div class="flex-1 flex flex-col">
     <header class="flex items-center p-4 border-b">
-      <div class="font-bold">Agent Builder</div>
+      <img src="/vite.svg" alt="CoAgent logo" class="h-6 w-6 mr-2" />
+      <div class="font-bold">CoAgent</div>
       <input type="text" placeholder="Search" class="border p-1 rounded flex-1 mx-4" />
       <div class="rounded-full bg-gray-300 w-8 h-8"></div>
     </header>
