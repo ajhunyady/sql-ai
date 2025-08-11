@@ -21,6 +21,10 @@
         <p class="text-sm">{agent.description}</p>
         <p class="text-xs text-gray-500">Status: {agent.status}</p>
       </button>
+
     {/each}
+  </div>
+  <div class="p-4 border-t">
+    <ChatEditor bind:value={input} on:ask={send} />
   </div>
 </div>

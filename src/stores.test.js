@@ -55,6 +55,11 @@ describe('agent store', () => {
     expect(get(currentAgent)).toBeNull();
     expect(get(currentPage)).toBe('home');
     expect(get(currentView)).toBe('home');
+
+    window.history.pushState({}, '', '/development');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    expect(get(currentAgent)).toBeNull();
+    expect(get(currentView)).toBe('development');
   });
 
   it('can create and delete agents', async () => {
