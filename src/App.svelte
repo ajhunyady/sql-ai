@@ -40,7 +40,6 @@
       <div>Version 0.1</div>
       <div class="flex gap-2">
         <button class="text-blue-500" on:click={() => currentView.set('log')}>Log</button>
-        <button class="text-blue-500" on:click={() => currentView.set('guide')}>Help</button>
       </div>
     </div>
   </footer>
