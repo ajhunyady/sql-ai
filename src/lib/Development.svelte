@@ -5,7 +5,7 @@
   import { agents, currentView, createNewAgent, openAgent, currentPage } from '../stores.js';
 </script>
 
-<div class="flex h-screen">
+<div class="flex h-full">
   <aside class="w-64 bg-gray-100 p-4 space-y-4">
     <button class="bg-blue-500 text-white w-full py-2 rounded" on:click={createNewAgent}>
       Create New Agent
