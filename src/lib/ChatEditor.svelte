@@ -35,7 +35,7 @@
     placeholder="Ask your question..."
     on:input={resize}
     on:keydown={handleKeydown}
-  />
+  ></textarea>
   <button
     type="button"
     class="absolute right-2 bottom-2 bg-blue-500 text-white px-3 py-1 rounded"
