@@ -1,5 +1,5 @@
 <script>
-  import { currentView, currentAgent, setPath } from '../stores.js';
+  import { currentView, currentAgent, currentPage } from '../stores.js';
   import { get } from 'svelte/store';
   import MetadataTab from './tabs/MetadataTab.svelte';
   import DataIntegrationsTab from './tabs/DataIntegrationsTab.svelte';
@@ -34,9 +34,9 @@
     if (get(currentAgent)) {
       currentView.set('workspace');
     } else {
+      currentPage.set('home');
       currentView.set('home');
       currentAgent.set(null);
-      setPath('/');
     }
   }
 </script>

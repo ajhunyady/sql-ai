@@ -1,39 +1,54 @@
 <script>
-  import { agents, createNewAgent, openAgent } from '../stores.js';
-  import AgentTile from './AgentTile.svelte';
+  import Home from './Home.svelte';
+  import AgentWorkspace from './AgentWorkspace.svelte';
+  import AgentGuide from './AgentGuide.svelte';
+  import { agents, currentView, createNewAgent, openAgent, currentPage } from '../stores.js';
 </script>
 
-<div class="p-8">
-  <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl">Agent Development</h1>
-    <div class="flex items-center gap-4">
-      <input
-        type="text"
-        placeholder="Search"
-        class="border p-1 rounded w-64"
-      />
-      <button
-        class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        on:click={createNewAgent}
-      >
-        <svg
-          class="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          aria-hidden="true"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10 4.167v11.666M4.167 10h11.666" />
-        </svg>
-        New Agent
-      </button>
+<div class="flex h-screen">
+  <aside class="w-64 bg-gray-100 p-4 space-y-4">
+    <button class="bg-blue-500 text-white w-full py-2 rounded" on:click={createNewAgent}>
+      Create New Agent
+    </button>
+    <div>
+      <h2 class="font-semibold mb-2">Agents</h2>
+      <ul class="space-y-1">
+        {#each $agents as agent}
+          <li class="flex items-center">
+            <button
+              class="text-left flex-1 p-1 rounded hover:bg-gray-200"
+              on:click={() => openAgent(agent)}
+            >
+              {agent.name}
+            </button>
+          </li>
+        {/each}
+      </ul>
     </div>
-  </div>
-  <h2 class="text-xl mb-2">Recent Agents</h2>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    {#each $agents as agent}
-      <AgentTile {agent} on:click={() => openAgent(agent)} />
-    {/each}
+    <div>
+      <h2 class="font-semibold mb-2">Reusable Library</h2>
+      <div class="text-sm text-gray-500">Configs, Credentials, Tools</div>
+    </div>
+  </aside>
+  <div class="flex-1 flex flex-col">
+    <header class="flex items-center p-4 border-b">
+      <div class="font-bold">Agent Builder</div>
+      <button class="text-blue-500 ml-4" on:click={() => currentPage.set('home')}>Back to Chat</button>
+      <input type="text" placeholder="Search" class="border p-1 rounded flex-1 mx-4" />
+      <div class="rounded-full bg-gray-300 w-8 h-8"></div>
+    </header>
+    <main class="flex-1 overflow-y-auto">
+      {#if $currentView === 'home'}
+        <Home />
+      {:else if $currentView === 'guide'}
+        <AgentGuide />
+      {:else}
+        <AgentWorkspace />
+      {/if}
+    </main>
+    <footer class="p-4 border-t text-sm text-gray-500 flex justify-between">
+      <div>Version 0.1</div>
+      <button class="text-blue-500" on:click={() => currentView.set('guide')}>Help</button>
+    </footer>
   </div>
 </div>
