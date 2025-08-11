@@ -1,4 +1,6 @@
 <script>
+  import ChatEditor from './ChatEditor.svelte';
+
   let input = '';
   let messages = [];
 
@@ -21,7 +23,7 @@
   }
 </script>
 
-<div class="flex flex-col h-full">
+<div class="flex flex-col h-full max-w-2xl mx-auto w-full">
   <h1 class="text-2xl p-8 text-center">What data question do you have?</h1>
   <div class="flex-1 overflow-y-auto p-4 space-y-4">
     {#each messages as msg}
@@ -36,16 +38,7 @@
       </div>
     {/each}
   </div>
-  <form class="p-4 border-t flex" on:submit|preventDefault={send}>
-    <input
-      class="flex-1 border rounded p-2 mr-2"
-      bind:value={input}
-      placeholder="Ask your question..."
-    />
-    <button class="bg-blue-500 text-white px-4 py-2 rounded">Send</button>
-  </form>
+  <div class="p-4 border-t">
+    <ChatEditor bind:value={input} on:ask={send} />
+  </div>
 </div>
-
-<style>
-  form button:disabled { opacity: 0.5; }
-</style>
