@@ -30,15 +30,15 @@
   <textarea
     bind:this={textarea}
     bind:value
-    rows="1"
-    class="w-full border rounded p-2 pr-16 resize-none"
+    rows="5"
+    class="w-full border rounded-xl p-2 pr-16 resize-none"
     placeholder="Ask your question..."
     on:input={resize}
     on:keydown={handleKeydown}
-  />
+  ></textarea>
   <button
     type="button"
-    class="absolute right-2 bottom-2 bg-blue-500 text-white px-3 py-1 rounded"
+    class="absolute right-2 bottom-2 bg-blue-500 text-white px-3 py-1 mb-2 rounded"
     on:click={send}
   >
     Ask

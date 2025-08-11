@@ -24,8 +24,8 @@
 </script>
 
 <div class="flex flex-col h-full max-w-2xl mx-auto w-full">
-  <h1 class="text-2xl p-8 text-center">What data question do you have?</h1>
-  <div class="flex-1 overflow-y-auto p-4 space-y-4">
+  <h1 class="text-2xl p-8 text-center">What is your data question?</h1>
+  <div class="flex-1 overflow-y-auto px-4 py-1 space-y-4">
     {#each messages as msg}
       <div class={msg.role === 'user' ? 'text-right' : ''}>
         <div
@@ -38,7 +38,7 @@
       </div>
     {/each}
   </div>
-  <div class="p-4 border-t">
+  <div class="p-1">
     <ChatEditor bind:value={input} on:ask={send} />
   </div>
 </div>
