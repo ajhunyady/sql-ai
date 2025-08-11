@@ -1,5 +1,6 @@
 <script>
   import ChatEditor from './ChatEditor.svelte';
+  import { currentView, setPath } from '../stores.js';
 
   let input = '';
   let messages = [];
@@ -40,5 +41,18 @@
   </div>
   <div class="p-1">
     <ChatEditor bind:value={input} on:ask={send} />
+  </div>
+  <div class="p-4 text-center text-sm text-gray-600">
+    Add your own data integrations in the
+    <button
+      class="text-blue-500"
+      on:click={() => {
+        currentView.set('builder');
+        setPath('/builder');
+      }}
+    >
+      Builder
+    </button>
+    section.
   </div>
 </div>
