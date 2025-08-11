@@ -27,18 +27,22 @@
 </script>
 
 <div class="relative w-full">
-  <textarea
-    bind:this={textarea}
-    bind:value
-    rows="5"
-    class="w-full border rounded-xl p-2 pr-16 resize-none"
-    placeholder="Ask your question..."
-    on:input={resize}
-    on:keydown={handleKeydown}
-  ></textarea>
-  <button
+    <textarea
+      bind:this={textarea}
+      bind:value
+      rows="5"
+      class="w-full border rounded-xl p-2 pr-16 resize-none
+            focus:outline-none
+            focus:ring-0 focus:ring-teal-500 focus:ring-offset-0
+            focus:border-teal-500
+            caret-teal-500"
+      placeholder="Ask your question..."
+      on:input={resize}
+      on:keydown={handleKeydown}
+    ></textarea>
+    <button
     type="button"
-    class="absolute right-2 bottom-2 bg-blue-500 text-white px-3 py-1 mb-2 rounded"
+    class="absolute right-2 bottom-2 bg-teal-500 text-white px-3 py-1 mb-2 rounded"
     on:click={send}
   >
     Ask

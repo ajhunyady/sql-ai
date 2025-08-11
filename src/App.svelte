@@ -60,8 +60,8 @@
       {/if}
     </div>
   </main>
-  <footer class="p-4 border-t">
-    <div class="p-4 text-sm text-gray-500 flex justify-between items-center w-full max-w-screen-2xl mx-auto">
+  <footer class="px-4 py-2 border-t">
+    <div class="px-4 py-2 text-sm text-gray-500 flex justify-between items-center w-full max-w-screen-2xl mx-auto">
       <div>Version 0.1</div>
       <div class="flex gap-2">
         <button class="text-blue-500" on:click={() => currentView.set('log')}>Log</button>
