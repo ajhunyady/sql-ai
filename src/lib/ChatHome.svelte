@@ -45,6 +45,9 @@
     />
     <button class="bg-blue-500 text-white px-4 py-2 rounded">Send</button>
   </form>
+  <div class="p-4 text-center text-sm text-gray-600">
+    Add your own data integrations in the <a href="/builder" class="text-blue-500">Builder</a> section.
+  </div>
   <footer class="p-4 text-sm text-gray-500 flex justify-between">
     <div></div>
     <button class="text-blue-500" on:click={() => currentPage.set('development')}>Development</button>
