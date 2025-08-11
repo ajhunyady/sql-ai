@@ -7,35 +7,41 @@
 </script>
 
 <div class="flex flex-col h-screen">
-  <header class="flex items-center p-4 border-b">
-    <button
-      type="button"
-      on:click={() => {
-        currentView.set('home');
-        currentAgent.set(null);
-        setPath('/');
-      }}
-    >
-      <img src="/coagent-logo.svg" alt="CoAgent" class="h-8" />
-    </button>
-    <div class="rounded-full bg-gray-300 w-8 h-8 ml-auto"></div>
+  <header class="border-b">
+    <div class="flex items-center p-4 w-full max-w-screen-2xl mx-auto">
+      <button
+        type="button"
+        on:click={() => {
+          currentView.set('home');
+          currentAgent.set(null);
+          setPath('/');
+        }}
+      >
+        <img src="/coagent-logo.svg" alt="CoAgent" class="h-8" />
+      </button>
+      <div class="rounded-full bg-gray-300 w-8 h-8 ml-auto"></div>
+    </div>
   </header>
   <main class="flex-1 overflow-y-auto">
-    {#if $currentView === 'home'}
-      <Home />
-    {:else if $currentView === 'guide'}
-      <AgentGuide />
-    {:else if $currentView === 'log'}
-      <EventLog />
-    {:else}
-      <AgentWorkspace />
-    {/if}
+    <div class="w-full max-w-screen-2xl mx-auto">
+      {#if $currentView === 'home'}
+        <Home />
+      {:else if $currentView === 'guide'}
+        <AgentGuide />
+      {:else if $currentView === 'log'}
+        <EventLog />
+      {:else}
+        <AgentWorkspace />
+      {/if}
+    </div>
   </main>
-  <footer class="p-4 border-t text-sm text-gray-500 flex justify-between">
-    <div>Version 0.1</div>
-    <div class="space-x-4">
-      <button class="text-blue-500" on:click={() => currentView.set('log')}>Log</button>
-      <button class="text-blue-500" on:click={() => currentView.set('guide')}>Help</button>
+  <footer class="p-4 border-t">
+    <div class="p-4 text-sm text-gray-500 flex justify-between w-full max-w-screen-2xl mx-auto">
+      <div>Version 0.1</div>
+      <div class="w-full max-w-screen-2xl mx-auto">
+        <button class="text-blue-500" on:click={() => currentView.set('log')}>Log</button>
+        <button class="text-blue-500" on:click={() => currentView.set('guide')}>Help</button>
+      </div>
     </div>
   </footer>
 </div>
