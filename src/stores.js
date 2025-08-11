@@ -27,7 +27,8 @@ if (typeof localStorage !== 'undefined') {
   });
 }
 
-export const currentView = writable('home');
+export const currentPage = writable('home'); // 'home' or 'development'
+export const currentView = writable('home'); // views within development
 export const currentAgent = writable(null);
 
 export function createNewAgent() {
@@ -35,11 +36,13 @@ export function createNewAgent() {
   const newAgent = { id, name: 'New Agent', description: '', status: 'Draft' };
   agents.update(a => [...a, newAgent]);
   currentAgent.set(newAgent);
+  currentPage.set('development');
   currentView.set('guide');
 }
 
 export function openAgent(agent) {
   currentAgent.set(agent);
+  currentPage.set('development');
   currentView.set('workspace');
 }
 
@@ -52,27 +55,37 @@ export function deleteAgent(agent) {
   }
 }
 
-function pathFromState(view, agent) {
-  if (view === 'guide') return '/guide';
-  if (view === 'workspace' && agent) return `/agent/${agent.id}`;
+function pathFromState(page, view, agent) {
+  if (page === 'development') {
+    if (view === 'guide') return '/development/guide';
+    if (view === 'workspace' && agent) return `/development/agent/${agent.id}`;
+    return '/development';
+  }
   return '/';
 }
 
 if (typeof window !== 'undefined') {
   const parsePath = () => {
     const parts = window.location.pathname.split('/').filter(Boolean);
-    if (parts[0] === 'agent' && parts[1]) {
-      const agent = get(agents).find(a => a.id === parts[1]);
-      if (agent) {
-        currentAgent.set(agent);
-        currentView.set('workspace');
+    if (parts[0] === 'development') {
+      currentPage.set('development');
+      if (parts[1] === 'agent' && parts[2]) {
+        const agent = get(agents).find(a => a.id === parts[2]);
+        if (agent) {
+          currentAgent.set(agent);
+          currentView.set('workspace');
+          return;
+        }
+      } else if (parts[1] === 'guide') {
+        currentAgent.set(null);
+        currentView.set('guide');
         return;
       }
-    } else if (parts[0] === 'guide') {
       currentAgent.set(null);
-      currentView.set('guide');
+      currentView.set('home');
       return;
     }
+    currentPage.set('home');
     currentAgent.set(null);
     currentView.set('home');
   };
@@ -83,14 +96,16 @@ if (typeof window !== 'undefined') {
 
   const sync = () => {
     if (suppress) return;
+    const page = get(currentPage);
     const view = get(currentView);
     const agent = get(currentAgent);
-    const path = pathFromState(view, agent);
+    const path = pathFromState(page, view, agent);
     if (window.location.pathname !== path) {
       history.pushState({}, '', path);
     }
   };
 
+  currentPage.subscribe(sync);
   currentView.subscribe(sync);
   currentAgent.subscribe(sync);
 
