@@ -30,7 +30,7 @@
   <textarea
     bind:this={textarea}
     bind:value
-    rows="1"
+    rows="4"
     class="w-full border rounded p-2 pr-16 resize-none"
     placeholder="Ask your question..."
     on:input={resize}
