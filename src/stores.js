@@ -93,8 +93,8 @@ export function createNewAgent() {
   agents.update(a => sortAgents([...a, newAgent]));
   logEvent('created', newAgent);
   currentAgent.set(newAgent);
-  currentView.set('guide');
-  setPath(id);
+  currentView.set('create-agent');
+  setPath('/create-agent');
 }
 
 export function openAgent(agent) {
@@ -122,12 +122,14 @@ function handleRoute() {
     currentView.set('builder');
     return;
   }
+  if (path === '/create-agent') {
+    currentView.set('create-agent');
+    return;
+  }
   const agent = get(agents).find(a => a.id === path);
   if (agent) {
     currentAgent.set(agent);
-    if (get(currentView) !== 'guide') {
-      currentView.set('workspace');
-    }
+    currentView.set('workspace');
   } else {
     currentAgent.set(null);
     currentView.set('home');

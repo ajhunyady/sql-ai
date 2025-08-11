@@ -53,11 +53,16 @@ describe('agent store', () => {
     expect(get(currentAgent)).toBeNull();
     expect(get(currentView)).toBe('home');
 
-    window.history.pushState({}, '', '/builder');
-    window.dispatchEvent(new PopStateEvent('popstate'));
-    expect(get(currentAgent)).toBeNull();
-    expect(get(currentView)).toBe('builder');
-  });
+      window.history.pushState({}, '', '/builder');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      expect(get(currentAgent)).toBeNull();
+      expect(get(currentView)).toBe('builder');
+
+      window.history.pushState({}, '', '/create-agent');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      expect(get(currentAgent)).toBeNull();
+      expect(get(currentView)).toBe('create-agent');
+    });
 
   it('logs create and delete events', async () => {
     const { createNewAgent, deleteAgent, eventLog, agents } = await import('./stores.js');

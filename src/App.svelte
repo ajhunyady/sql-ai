@@ -2,7 +2,7 @@
   import Home from './lib/Home.svelte';
   import Builder from './lib/Builder.svelte';
   import AgentWorkspace from './lib/AgentWorkspace.svelte';
-  import AgentGuide from './lib/AgentGuide.svelte';
+  import CreateAgent from './lib/CreateAgent.svelte';
   import EventLog from './lib/EventLog.svelte';
   import { currentView, currentAgent, setPath } from './stores.js';
 </script>
@@ -49,15 +49,15 @@
     <div class="w-full max-w-screen-2xl mx-auto">
       {#if $currentView === 'home'}
         <Home />
-      {:else if $currentView === 'builder'}
-        <Builder />
-      {:else if $currentView === 'guide'}
-        <AgentGuide />
-      {:else if $currentView === 'log'}
-        <EventLog />
-      {:else}
-        <AgentWorkspace />
-      {/if}
+        {:else if $currentView === 'builder'}
+          <Builder />
+        {:else if $currentView === 'create-agent'}
+          <CreateAgent />
+        {:else if $currentView === 'log'}
+          <EventLog />
+        {:else}
+          <AgentWorkspace />
+        {/if}
     </div>
   </main>
   <footer class="px-4 py-2 border-t">
