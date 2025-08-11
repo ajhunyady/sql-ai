@@ -1,5 +1,6 @@
 <script>
   import Home from './lib/Home.svelte';
+  import Development from './lib/Development.svelte';
   import AgentWorkspace from './lib/AgentWorkspace.svelte';
   import AgentGuide from './lib/AgentGuide.svelte';
   import EventLog from './lib/EventLog.svelte';
@@ -19,7 +20,17 @@
       >
         <img src="/coagent-logo.svg" alt="CoAgent" class="h-8" />
       </button>
-      <h1 class="ml-2 text-xl font-semibold">CoAgent</h1>
+       <h1 class="ml-2 text-xl font-semibold">CoAgent</h1>
+      <button
+        class="ml-4 text-sm text-gray-600"
+        on:click={() => {
+          currentView.set('development');
+          currentAgent.set(null);
+          setPath('/development');
+        }}
+      >
+        Development
+      </button>
       <div class="rounded-full bg-gray-300 w-8 h-8 ml-auto"></div>
     </div>
   </header>
@@ -27,6 +38,8 @@
     <div class="w-full max-w-screen-2xl mx-auto">
       {#if $currentView === 'home'}
         <Home />
+      {:else if $currentView === 'development'}
+        <Development />
       {:else if $currentView === 'guide'}
         <AgentGuide />
       {:else if $currentView === 'log'}
