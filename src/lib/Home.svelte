@@ -1,5 +1,19 @@
 <script>
   import { agents, createNewAgent, openAgent } from '../stores.js';
+
+  // Input captured from the ChatEditor component
+  let input = '';
+
+  // Placeholder handler for queries submitted via ChatEditor
+  function send() {
+    if (!input.trim()) return;
+
+    // In a future iteration this could forward the question to a backend
+    console.log('Agent development query:', input);
+
+    // Clear the editor after handling the input
+    input = '';
+  }
 </script>
 
 <div class="p-8">
