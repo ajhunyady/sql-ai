@@ -5,7 +5,7 @@
 
 <div class="p-8">
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl">Welcome to CoAgent</h1>
+    <h1 class="text-2xl">Agent Development</h1>
     <div class="flex items-center gap-4">
       <input
         type="text"
