@@ -53,5 +53,15 @@ describe('agent store', () => {
     expect(get(currentAgent)).toBeNull();
     expect(get(currentView)).toBe('home');
   });
+
+  it('logs create and delete events', async () => {
+    const { createNewAgent, deleteAgent, eventLog, agents } = await import('./stores.js');
+    createNewAgent();
+    const newAgent = get(agents).find(a => a.name === 'New Agent');
+    deleteAgent(newAgent);
+    const log = get(eventLog);
+    expect(log[1]).toMatchObject({ action: 'created', agentId: newAgent.id });
+    expect(log[0]).toMatchObject({ action: 'deleted', agentId: newAgent.id });
+  });
 });
 
