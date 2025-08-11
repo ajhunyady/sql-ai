@@ -19,6 +19,7 @@
       >
         <img src="/coagent-logo.svg" alt="CoAgent" class="h-8" />
       </button>
+      <h1 class="ml-2 text-xl font-semibold">CoAgent</h1>
       <div class="rounded-full bg-gray-300 w-8 h-8 ml-auto"></div>
     </div>
   </header>
