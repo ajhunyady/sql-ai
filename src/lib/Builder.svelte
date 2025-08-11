@@ -5,7 +5,7 @@
 
 <div class="p-8">
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl">Agent Builder</h1>
+    <h1 class="text-3xl font-semibold text-teal-700">Agent Builder</h1>
     <div class="flex items-center gap-4">
       <input
         type="text"
@@ -13,7 +13,7 @@
         class="border p-1 rounded w-64"
       />
       <button
-        class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        class="inline-flex items-center gap-2 rounded-md bg-teal-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
         on:click={createNewAgent}
       >
         <svg
@@ -30,10 +30,11 @@
       </button>
     </div>
   </div>
-  <h2 class="text-xl mb-2">Recent Agents</h2>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    {#each $agents as agent}
-      <AgentTile {agent} on:click={() => openAgent(agent)} />
-    {/each}
+  <div class="py-2">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {#each $agents as agent}
+        <AgentTile {agent} on:click={() => openAgent(agent)} />
+      {/each}
+    </div>
   </div>
 </div>

@@ -25,7 +25,7 @@
 </script>
 
 <div class="flex flex-col h-full max-w-2xl mx-auto w-full">
-  <h1 class="text-2xl p-8 text-center">What is your data question?</h1>
+  <h1 class="text-2xl mt-3 p-6 text-center">What is your data question?</h1>
   <div class="flex-1 overflow-y-auto px-4 py-1 space-y-4">
     {#each messages as msg}
       <div class={msg.role === 'user' ? 'text-right' : ''}>
@@ -42,8 +42,8 @@
   <div class="p-1">
     <ChatEditor bind:value={input} on:ask={send} />
   </div>
-  <div class="p-4 text-center text-sm text-gray-600">
-    Add your own data integrations in the
+  <div class="px-4 py-1 text-center text-sm text-gray-600">
+    Integrate your data agents in the
     <button
       class="text-blue-500"
       on:click={() => {

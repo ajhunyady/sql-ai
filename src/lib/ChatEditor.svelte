@@ -42,7 +42,7 @@
     ></textarea>
     <button
     type="button"
-    class="absolute right-2 bottom-2 bg-teal-500 text-white px-3 py-1 mb-2 rounded"
+    class="absolute right-2 bottom-2 bg-teal-600 text-white px-3 py-1 mb-2 rounded"
     on:click={send}
   >
     Ask
