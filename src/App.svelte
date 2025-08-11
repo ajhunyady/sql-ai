@@ -1,6 +1,6 @@
 <script>
   import Home from './lib/Home.svelte';
-  import Development from './lib/Development.svelte';
+  import Builder from './lib/Builder.svelte';
   import AgentWorkspace from './lib/AgentWorkspace.svelte';
   import AgentGuide from './lib/AgentGuide.svelte';
   import EventLog from './lib/EventLog.svelte';
@@ -30,25 +30,27 @@
       >
         CoAgent
       </button>
-      <button
-        class="ml-4 text-sm text-gray-600"
-        on:click={() => {
-          currentView.set('development');
-          currentAgent.set(null);
-          setPath('/development');
-        }}
-      >
-        Development
-      </button>
-      <div class="rounded-full bg-gray-300 w-8 h-8 ml-auto"></div>
+      <div class="ml-auto flex items-center gap-4">
+        <button
+          class="text-sm text-gray-600"
+          on:click={() => {
+            currentView.set('builder');
+            currentAgent.set(null);
+            setPath('/builder');
+          }}
+        >
+          Builder
+        </button>
+        <div class="rounded-full bg-gray-300 w-8 h-8"></div>
+      </div>
     </div>
   </header>
   <main class="flex-1 overflow-y-auto">
     <div class="w-full max-w-screen-2xl mx-auto">
       {#if $currentView === 'home'}
         <Home />
-      {:else if $currentView === 'development'}
-        <Development />
+      {:else if $currentView === 'builder'}
+        <Builder />
       {:else if $currentView === 'guide'}
         <AgentGuide />
       {:else if $currentView === 'log'}
