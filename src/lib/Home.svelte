@@ -1,39 +1,51 @@
 <script>
-  import { agents, createNewAgent, openAgent } from '../stores.js';
-  import AgentTile from './AgentTile.svelte';
+  let input = '';
+  let messages = [];
+
+  async function send() {
+    if (!input.trim()) return;
+    const question = input;
+    messages = [...messages, { role: 'user', content: question }];
+    input = '';
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+      const data = await res.json();
+      messages = [...messages, { role: 'assistant', content: data.answer || 'No response' }];
+    } catch (e) {
+      messages = [...messages, { role: 'assistant', content: 'Error contacting server' }];
+    }
+  }
 </script>
 
-<div class="p-8">
-  <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl">Welcome to CoAgent</h1>
-    <div class="flex items-center gap-4">
-      <input
-        type="text"
-        placeholder="Search"
-        class="border p-1 rounded w-64"
-      />
-      <button
-        class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        on:click={createNewAgent}
-      >
-        <svg
-          class="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          aria-hidden="true"
+<div class="flex flex-col h-full">
+  <h1 class="text-2xl p-8 text-center">What data question do you have?</h1>
+  <div class="flex-1 overflow-y-auto p-4 space-y-4">
+    {#each messages as msg}
+      <div class={msg.role === 'user' ? 'text-right' : ''}>
+        <div
+          class="inline-block px-4 py-2 rounded"
+          class:bg-blue-100={msg.role === 'user'}
+          class:bg-gray-200={msg.role !== 'user'}
         >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10 4.167v11.666M4.167 10h11.666" />
-        </svg>
-        New Agent
-      </button>
-    </div>
-  </div>
-  <h2 class="text-xl mb-2">Recent Agents</h2>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    {#each $agents as agent}
-      <AgentTile {agent} on:click={() => openAgent(agent)} />
+          {msg.content}
+        </div>
+      </div>
     {/each}
   </div>
+  <form class="p-4 border-t flex" on:submit|preventDefault={send}>
+    <input
+      class="flex-1 border rounded p-2 mr-2"
+      bind:value={input}
+      placeholder="Ask your question..."
+    />
+    <button class="bg-blue-500 text-white px-4 py-2 rounded">Send</button>
+  </form>
 </div>
+
+<style>
+  form button:disabled { opacity: 0.5; }
+</style>

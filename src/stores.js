@@ -109,14 +109,19 @@ export function deleteAgent(agent) {
   const curr = get(currentAgent);
   if (curr && curr.id === agent.id) {
     currentAgent.set(null);
-    currentView.set('home');
-    setPath('/');
+    currentView.set('development');
+    setPath('/development');
   }
 }
 
 function handleRoute() {
   if (typeof window === 'undefined') return;
   const path = window.location.pathname;
+  if (path === '/development') {
+    currentAgent.set(null);
+    currentView.set('development');
+    return;
+  }
   const agent = get(agents).find(a => a.id === path);
   if (agent) {
     currentAgent.set(agent);

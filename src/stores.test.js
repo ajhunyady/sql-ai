@@ -52,6 +52,11 @@ describe('agent store', () => {
     window.dispatchEvent(new PopStateEvent('popstate'));
     expect(get(currentAgent)).toBeNull();
     expect(get(currentView)).toBe('home');
+
+    window.history.pushState({}, '', '/development');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    expect(get(currentAgent)).toBeNull();
+    expect(get(currentView)).toBe('development');
   });
 
   it('logs create and delete events', async () => {
