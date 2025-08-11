@@ -49,6 +49,29 @@ if (typeof localStorage !== 'undefined') {
   });
 }
 
+let initialLog = [];
+if (typeof localStorage !== 'undefined') {
+  const storedLog = localStorage.getItem('eventLog');
+  if (storedLog) {
+    initialLog = JSON.parse(storedLog);
+  }
+}
+
+export const eventLog = writable(initialLog);
+
+if (typeof localStorage !== 'undefined') {
+  eventLog.subscribe(value => {
+    localStorage.setItem('eventLog', JSON.stringify(value));
+  });
+}
+
+function logEvent(action, agent) {
+  eventLog.update(log => [
+    { action, agentId: agent.id, timestamp: new Date().toISOString() },
+    ...log
+  ]);
+}
+
 export const currentView = writable('home');
 export const currentAgent = writable(null);
 
@@ -68,6 +91,7 @@ export function createNewAgent() {
     createdAt: new Date().toISOString()
   };
   agents.update(a => sortAgents([...a, newAgent]));
+  logEvent('created', newAgent);
   currentAgent.set(newAgent);
   currentView.set('guide');
   setPath(id);
@@ -81,6 +105,7 @@ export function openAgent(agent) {
 
 export function deleteAgent(agent) {
   agents.update(a => sortAgents(a.filter(x => x.id !== agent.id)));
+  logEvent('deleted', agent);
   const curr = get(currentAgent);
   if (curr && curr.id === agent.id) {
     currentAgent.set(null);

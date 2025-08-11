@@ -2,6 +2,7 @@
   import Home from './lib/Home.svelte';
   import AgentWorkspace from './lib/AgentWorkspace.svelte';
   import AgentGuide from './lib/AgentGuide.svelte';
+  import EventLog from './lib/EventLog.svelte';
   import { currentView, currentAgent, setPath } from './stores.js';
 </script>
 
@@ -24,12 +25,17 @@
       <Home />
     {:else if $currentView === 'guide'}
       <AgentGuide />
+    {:else if $currentView === 'log'}
+      <EventLog />
     {:else}
       <AgentWorkspace />
     {/if}
   </main>
   <footer class="p-4 border-t text-sm text-gray-500 flex justify-between">
     <div>Version 0.1</div>
-    <button class="text-blue-500" on:click={() => currentView.set('guide')}>Help</button>
+    <div class="space-x-4">
+      <button class="text-blue-500" on:click={() => currentView.set('log')}>Log</button>
+      <button class="text-blue-500" on:click={() => currentView.set('guide')}>Help</button>
+    </div>
   </footer>
 </div>
