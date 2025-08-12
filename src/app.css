@@ -1,6 +1,5 @@
 @import 'flowbite/dist/flowbite.min.css';
 @import 'tailwindcss';
-
 .chat-hover:hover {
   background: linear-gradient(90deg,
       color-mix(in srgb, theme('colors.blue.400') 10%, transparent),
@@ -38,33 +37,56 @@ body {
 
 /* Reusable component styles */
 .glass-panel {
-  @apply backdrop-blur-xl bg-slate-950/80 border border-blue-500/30 rounded-xl;
+  backdrop-filter: blur(theme('blur.xl'));
+  background-color: color-mix(in srgb, theme('colors.slate.950') 80%, transparent);
+  border: 1px solid color-mix(in srgb, theme('colors.blue.500') 30%, transparent);
+  border-radius: theme('borderRadius.xl');
 }
 
 .glass-panel-lg {
-  @apply backdrop-blur-xl bg-slate-950/80 border border-blue-500/30 rounded-2xl;
+  backdrop-filter: blur(theme('blur.xl'));
+  background-color: color-mix(in srgb, theme('colors.slate.950') 80%, transparent);
+  border: 1px solid color-mix(in srgb, theme('colors.blue.500') 30%, transparent);
+  border-radius: theme('borderRadius.2xl');
 }
 
 .message-container {
-  @apply glass-panel p-5;
+  backdrop-filter: blur(theme('blur.xl'));
+  background-color: color-mix(in srgb, theme('colors.slate.950') 80%, transparent);
+  border: 1px solid color-mix(in srgb, theme('colors.blue.500') 30%, transparent);
+  border-radius: theme('borderRadius.xl');
+  padding: theme('spacing.5');
 }
 
 .avatar-border {
-  @apply border-2 border-blue-500/30;
+  border: 2px solid color-mix(in srgb, theme('colors.blue.500') 30%, transparent);
 }
 
 .gradient-text {
-  @apply bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent;
+  background-image: linear-gradient(to right, theme('colors.blue.400'), theme('colors.blue.600'));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 .button-hover {
-  @apply transition-all duration-300 transform hover:scale-105;
+  transition: all theme('transitionDuration.300');
+  transform: scale(1);
+}
+
+.button-hover:hover {
+  transform: scale(1.05);
 }
 
 .icon-button {
-  @apply text-slate-400 hover:text-blue-400 transition-colors duration-300;
+  color: theme('colors.slate.400');
+  transition: color theme('transitionDuration.300');
+}
+
+.icon-button:hover {
+  color: theme('colors.blue.400');
 }
 
 .glow-effect {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 20px color-mix(in srgb, theme('colors.blue.500') 10%, transparent);
 }

@@ -4,7 +4,7 @@
 	import ChatHistoryItem from './ChatHistoryItem.svelte';
 </script>
 
-<nav
+<div
 	class="fixed top-20 left-0 w-72 h-full backdrop-blur-xl bg-slate-950/80 border-r border-blue-500/20"
 	aria-label="Chat navigation"
 >
@@ -54,5 +54,5 @@
 			<ChatHistoryItem title="Market share insights" time="Aug 8, 2025" />
 			<ChatHistoryItem title="Inventory turnover rates" time="Aug 7, 2025" />
 		</div>
-	</nav>
+	</div>
 </div>
