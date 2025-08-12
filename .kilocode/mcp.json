@@ -1,0 +1,10 @@
+{
+    "mcpServers": {
+        "mcp-svelte-docs": {
+            "command": "pnpx",
+            "args": [
+                "mcp-svelte-docs"
+            ]
+        }
+    }
+}
