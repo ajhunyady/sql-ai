@@ -3,6 +3,17 @@
 	import { CogSolid, ChevronDownOutline } from 'flowbite-svelte-icons';
 	import logo from '$lib/assets/coagent.png';
 	import { AVATAR_URL, APP_NAME } from '$lib/constants';
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
+
+	// Determine active section based on current route
+	$: activeSection = page.url.pathname === '/analyst' ? 'analyst' : 
+	                   page.url.pathname === '/builder' ? 'builder' : 
+	                   'analyst';
+
+	function navigateToSection(section: string) {
+		goto(`/${section}`);
+	}
 </script>
 
 <header class="backdrop-blur-xl bg-slate-950/80 sticky top-0 z-50 border-b border-blue-500/20">
@@ -14,12 +25,17 @@
 			</div>
 			<div class="hidden md:flex space-x-1 text-sm">
 				<div class="bg-slate-900 rounded-xl overflow-hidden flex">
-					<Button color="blue" class="px-6 py-2"
+					<Button
+						color={activeSection === 'analyst' ? 'blue' : 'none'}
+						class="px-6 py-2 {activeSection === 'analyst' ? '' : 'text-slate-400 hover:text-white hover:bg-slate-800'} transition-all duration-300"
+						onclick={() => navigateToSection('analyst')}
 						>Analyst</Button
 					>
 					<Button
-						class="px-6 py-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-all duration-300"
-						>Developer</Button
+						color={activeSection === 'builder' ? 'blue' : 'none'}
+						class="px-6 py-2 {activeSection === 'builder' ? '' : 'text-slate-400 hover:text-white hover:bg-slate-800'} transition-all duration-300"
+						onclick={() => navigateToSection('builder')}
+						>Builder</Button
 					>
 				</div>
 			</div>

@@ -1,11 +1,10 @@
 <script>
-  import Header from "$lib/components/Header.svelte";
-  import Sidebar from "$lib/components/Sidebar.svelte";
-  import MainContent from "$lib/components/MainContent.svelte";
+  import { goto } from '$app/navigation';
+  import { onMount } from 'svelte';
+
+  onMount(() => {
+    goto('/analyst', { replaceState: true });
+  });
 </script>
 
-<div class="min-h-screen">
-  <Header />
-  <Sidebar />
-  <MainContent />
-</div>
+<!-- This page redirects to /analyst -->
