@@ -9,7 +9,7 @@
     <i class="fa-solid fa-robot text-white"></i>
   </div>
   <div class="flex-1">
-    <div class="glass-effect rounded-xl p-5 border border-dark-blue-500/30">
+    <div class="backdrop-blur-xl bg-slate-950/80 rounded-xl p-5 border border-dark-blue-500/30">
       <p class="mb-6 text-slate-200">Here are the top 5 customers by revenue for Q1 2025:</p>
 
       <div class="overflow-x-auto mb-6">

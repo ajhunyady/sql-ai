@@ -3,7 +3,7 @@
   import logo from '$lib/assets/coagent.png';
 </script>
 
-<header class="glass-effect sticky top-0 z-50 border-b border-blue-500/20">
+<header class="backdrop-blur-xl bg-slate-950/80 sticky top-0 z-50 border-b border-blue-500/20">
   <div class="w-full px-6 py-4 flex items-center justify-between">
     <div class="flex items-center">
       <div class="text-xl mr-8 flex items-center font-semibold">
@@ -12,7 +12,7 @@
           >CoAgent</span
         >
       </div>
-      <div class="hidden md:flex space-x-1 text-sm gradient-border">
+      <div class="hidden md:flex space-x-1 text-sm">
         <div class="bg-slate-900 rounded-xl overflow-hidden flex">
           <Button variant="gradient" gradient="blue" class="px-6 py-2 text-white font-medium">Analyst</Button>
           <Button class="px-6 py-2 text-slate-400 hover:text-white hover:bg-slate-800 transition-all duration-300">Developer</Button>

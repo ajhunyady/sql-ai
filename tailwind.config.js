@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        'dark-blues': {
+        'dark-blue': {
           "50": "#e1f5fe",
           "100": "#b3e5fc",
           "200": "#81d4fa",

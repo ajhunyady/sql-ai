@@ -8,52 +8,36 @@
 ::-webkit-scrollbar {
   display: none;
 }
-.gradient-border {
-  background: linear-gradient(135deg, #3b82f6, #1e40af, #1e3a8a);
-  padding: 1px;
-  border-radius: 12px;
-}
-.gradient-bg {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-}
-.glass-effect {
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-}
+
 .chat-hover:hover {
-  background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), rgba(30, 64, 175, 0.05));
-  border-left: 3px solid #3b82f6;
+  background: linear-gradient(90deg,
+      color-mix(in srgb, theme('colors.blue.400') 10%, transparent),
+      color-mix(in srgb, theme('colors.blue.800') 5%, transparent));
+  border-left: 3px solid theme('colors.blue.400');
   transform: translateX(2px);
   transition: all 0.3s ease;
 }
-.glow-effect {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-}
+
 .pulse-animation {
   animation: pulse 2s infinite;
 }
+
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.7;
   }
-}
-.highlighted-section {
-  outline: 2px solid #3f20fb;
-  background-color: rgba(63, 32, 251, 0.1);
-}
-.edit-button {
-  position: absolute;
-  z-index: 1000;
 }
 
 ::-webkit-scrollbar {
   display: none;
 }
+
 html,
 body {
   -ms-overflow-style: none;

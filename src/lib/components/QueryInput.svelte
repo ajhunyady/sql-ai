@@ -3,7 +3,7 @@
 </script>
 
 <section class="mb-10 w-full max-w-4xl">
-  <div class="glass-effect rounded-2xl border border-dark-blue-500/30 p-6 md:p-8 glow-effect">
+  <div class="backdrop-blur-xl bg-slate-950/80 rounded-2xl border border-dark-blue-500/30 p-6 md:p-8 glow-effect">
     <div class="mb-6">
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center">
