@@ -51,6 +51,7 @@ body {
   position: absolute;
   z-index: 1000;
 }
+
 ::-webkit-scrollbar {
   display: none;
 }

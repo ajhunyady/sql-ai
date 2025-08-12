@@ -1,18 +1,15 @@
 <script>
   import { Button, Avatar } from 'flowbite-svelte';
+  import logo from '$lib/assets/coagent.png';
 </script>
 
 <header class="glass-effect sticky top-0 z-50 border-b border-blue-500/20">
   <div class="w-full px-6 py-4 flex items-center justify-between">
     <div class="flex items-center">
       <div class="text-xl mr-8 flex items-center font-semibold">
-        <div
-          class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mr-3"
-        >
-          <i class="fa-solid fa-database text-white text-sm"></i>
-        </div>
-        <span class="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent"
-          >DataQuery AI</span
+        <img src={logo} alt="Coagent Logo" class="w-8 h-8 mr-3" />
+        <span class="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text"
+          >CoAgent</span
         >
       </div>
       <div class="hidden md:flex space-x-1 text-sm gradient-border">
@@ -23,10 +20,7 @@
       </div>
     </div>
     <div class="flex items-center space-x-3">
-      <Button color="gray" class="p-3 text-slate-400 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300" aria-label="Notifications">
-        <i class="fa-solid fa-bell"></i>
-      </Button>
-      <Button color="gray" class="p-3 text-slate-400 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300" aria-label="Settings">
+      <Button class="p-3 text-slate-400 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300" aria-label="Settings">
         <i class="fa-solid fa-gear"></i>
       </Button>
       <div

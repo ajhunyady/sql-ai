@@ -12,7 +12,7 @@
             >Connected to: <span class="text-blue-400">SalesDB</span></span
           >
         </div>
-        <Button color="gray" class="text-sm text-slate-400 hover:text-blue-400 flex items-center transition-colors duration-300">
+        <Button class="text-sm text-slate-400 hover:text-blue-400 flex items-center transition-colors duration-300">
           <i class="fa-solid fa-database mr-2"></i>
           Change Source
         </Button>
@@ -21,17 +21,11 @@
     </div>
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <Button color="gray" class="p-3 text-slate-400 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300" aria-label="Use microphone">
-          <i class="fa-solid fa-microphone"></i>
-        </Button>
-        <Button color="gray" class="p-3 text-slate-400 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300" aria-label="Upload file">
+        <Button class="p-3 text-slate-400 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300" aria-label="Upload file">
           <i class="fa-solid fa-upload"></i>
         </Button>
-        <Button color="gray" class="p-3 text-slate-400 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300" aria-label="Upload image">
-          <i class="fa-solid fa-image"></i>
-        </Button>
       </div>
-      <Button gradient="blue" class="px-6 py-3 rounded-xl flex items-center font-medium text-white transition-all duration-300 transform hover:scale-105 glow-effect">
+      <Button class="px-6 py-3 rounded-xl flex items-center font-medium text-white transition-all duration-300 transform hover:scale-105 glow-effect">
         <i class="fa-solid fa-paper-plane mr-2"></i>
         Ask Question
       </Button>

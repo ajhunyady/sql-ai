@@ -5,8 +5,8 @@
   export let active = false;
 </script>
 
-<div class="w-full" class:border-l-2={active} class:border-blue-500={active} class:bg-blue-500-10={active}>
-  <Button class="w-full p-3 chat-hover rounded-xl" color={active ? "blue" : "gray"}>
+<div class="w-full">
+  <div class="w-full p-3 chat-hover rounded-xl cursor-pointer" color={active ? "dark" : ""}>
     <div class="text-left">
       <p class="text-sm font-medium text-slate-200">{title}</p>
       <p class="text-xs text-slate-400 mt-1 flex items-center">
@@ -17,5 +17,5 @@
         {time}
       </p>
     </div>
-  </Button>
+  </div>
 </div>
