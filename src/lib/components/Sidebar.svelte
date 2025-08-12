@@ -14,13 +14,11 @@
     </div>
 
     <!-- New Chat Button -->
-    <Button pill color="yellow" class="w-full px-4 py-3 mb-8 flex items-center justify-center text-sm font-medium transition-all duration-300 transform hover:scale-105">
+    <Button color="blue" class="w-full px-4 py-3 mb-8 flex items-center justify-center text-sm font-medium transition-all duration-300 transform hover:scale-105">
       <i class="fa-solid fa-plus mr-2"></i>
       New Conversation
     </Button>
-
-    <Button>Hi</Button>
-
+    
     <!-- Chat History -->
     <div class="mb-4">
       <h3 class="text-lg font-semibold text-slate-300 mb-4 flex items-center">

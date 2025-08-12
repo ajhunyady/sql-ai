@@ -9,8 +9,8 @@
   <div
     class="p-3 chat-hover rounded-xl cursor-pointer"
     class:border-l-2={active}
-    class:border-dark-blue-500={active}
-    class:bg-dark-blue-500-10={active}
+    class:border-blue-500={active}
+    class:bg-blue-500-10={active}
   >
     <p class="text-sm font-medium text-slate-200">{title}</p>
     <p class="text-xs text-slate-400 mt-1 flex items-center">
