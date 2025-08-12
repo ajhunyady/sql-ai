@@ -1,5 +1,5 @@
 <script>
-  import { Button } from 'flowbite-svelte';
+  import { ArrowRightAltSolid } from 'flowbite-svelte-icons';
   export let title;
   export let time;
   export let active = false;
@@ -14,7 +14,7 @@
   >
     <p class="text-sm font-medium text-slate-200">{title}</p>
     <p class="text-xs text-slate-400 mt-1 flex items-center">
-      <i class="fa-solid fa-circle text-green-500 text-xs mr-2 pulse-animation" class:hidden={!active}></i>
+      <span class:hidden={!active}><ArrowRightAltSolid class="text-green-500 mr-2 pulse-animation" /></span>
       {time}
     </p>
   </div>

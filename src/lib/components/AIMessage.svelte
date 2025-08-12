@@ -1,12 +1,13 @@
-<script>
+<script lang="ts">
   export let timestamp;
+	import { CogSolid, ThumbsUpOutline, ThumbsDownOutline,  DatabaseSolid, ShareNodesSolid, DownloadSolid } from 'flowbite-svelte-icons';
 </script>
 
 <div class="flex items-start">
   <div
     class="w-10 h-10 rounded-xl mr-4 mt-1 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center border-2 border-blue-500/30"
   >
-    <i class="fa-solid fa-robot text-white"></i>
+    <CogSolid class="w-6 h-6 text-white" />
   </div>
   <div class="flex-1">
     <div class="backdrop-blur-xl bg-slate-950/80 rounded-xl p-5 border border-blue-500/30">
@@ -88,8 +89,8 @@
         <div
           class="bg-gradient-to-r from-blue-600/20 to-blue-800/20 text-slate-300 p-3 rounded-lg mb-3 text-sm flex items-center"
         >
-          <i class="fa-solid fa-code mr-2 text-blue-400"></i>
-          <span class="font-medium">Generated SQL Query</span>
+          <DatabaseSolid class="w-4 h-4 mr-2 text-slate-400" />
+          <span>Generated SQL Query</span>
         </div>
         <pre
           class="text-sm text-slate-300 overflow-x-auto font-mono"
@@ -111,25 +112,25 @@ LIMIT 5;</pre>
           class="text-slate-400 hover:text-green-400 transition-colors duration-300"
           aria-label="Like"
         >
-          <i class="fa-regular fa-thumbs-up"></i>
+          <ThumbsUpOutline class="w-5 h-5" />
         </button>
         <button
           class="text-slate-400 hover:text-red-400 transition-colors duration-300"
           aria-label="Dislike"
         >
-          <i class="fa-regular fa-thumbs-down"></i>
+          <ThumbsDownOutline class="w-5 h-5" />
         </button>
         <button
           class="text-slate-400 hover:text-blue-400 transition-colors duration-300"
           aria-label="Share"
         >
-          <i class="fa-solid fa-share"></i>
+          <ShareNodesSolid class="w-5 h-5" />
         </button>
         <button
           class="text-slate-400 hover:text-blue-400 transition-colors duration-300"
           aria-label="Download"
         >
-          <i class="fa-solid fa-download"></i>
+          <DownloadSolid class="w-5 h-5" />
         </button>
       </div>
     </div>

@@ -13,6 +13,6 @@ export default {
       }
     }
   },
-  plugins: [flowbite],
+  plugins: [flowbite, require('@tailwindcss/forms')],
   darkMode: 'class'
 };
