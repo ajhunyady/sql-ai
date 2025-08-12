@@ -1,10 +1,6 @@
 @import 'flowbite/dist/flowbite.min.css';
 @import 'tailwindcss';
 
-::-webkit-scrollbar {
-  display: none;
-}
-
 .chat-hover:hover {
   background: linear-gradient(90deg,
       color-mix(in srgb, theme('colors.blue.400') 10%, transparent),
@@ -38,4 +34,37 @@ html,
 body {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Reusable component styles */
+.glass-panel {
+  @apply backdrop-blur-xl bg-slate-950/80 border border-blue-500/30 rounded-xl;
+}
+
+.glass-panel-lg {
+  @apply backdrop-blur-xl bg-slate-950/80 border border-blue-500/30 rounded-2xl;
+}
+
+.message-container {
+  @apply glass-panel p-5;
+}
+
+.avatar-border {
+  @apply border-2 border-blue-500/30;
+}
+
+.gradient-text {
+  @apply bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent;
+}
+
+.button-hover {
+  @apply transition-all duration-300 transform hover:scale-105;
+}
+
+.icon-button {
+  @apply text-slate-400 hover:text-blue-400 transition-colors duration-300;
+}
+
+.glow-effect {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
 }

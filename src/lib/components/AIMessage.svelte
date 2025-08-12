@@ -1,16 +1,19 @@
 <script lang="ts">
-  export let timestamp;
-	import { CogSolid, ThumbsUpOutline, ThumbsDownOutline,  DatabaseSolid, ShareNodesSolid, DownloadSolid } from 'flowbite-svelte-icons';
+	import { CogSolid, ThumbsUpOutline, ThumbsDownOutline, DatabaseSolid, ShareNodesSolid, DownloadSolid } from 'flowbite-svelte-icons';
+	
+	let { timestamp } = $props();
 </script>
 
 <div class="flex items-start">
   <div
-    class="w-10 h-10 rounded-xl mr-4 mt-1 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center border-2 border-blue-500/30"
+    class="w-10 h-10 rounded-xl mr-4 mt-1 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center avatar-border"
+    role="img"
+    aria-label="AI Assistant"
   >
     <CogSolid class="w-6 h-6 text-white" />
   </div>
   <div class="flex-1">
-    <div class="backdrop-blur-xl bg-slate-950/80 rounded-xl p-5 border border-blue-500/30">
+    <div class="message-container">
       <p class="mb-6 text-slate-200">Here are the top 5 customers by revenue for Q1 2025:</p>
 
       <div class="overflow-x-auto mb-6">
@@ -109,26 +112,26 @@ LIMIT 5;</pre>
       <div class="text-xs text-slate-500">{timestamp}</div>
       <div class="flex space-x-3">
         <button
-          class="text-slate-400 hover:text-green-400 transition-colors duration-300"
-          aria-label="Like"
+          class="icon-button hover:text-green-400"
+          aria-label="Like this response"
         >
           <ThumbsUpOutline class="w-5 h-5" />
         </button>
         <button
-          class="text-slate-400 hover:text-red-400 transition-colors duration-300"
-          aria-label="Dislike"
+          class="icon-button hover:text-red-400"
+          aria-label="Dislike this response"
         >
           <ThumbsDownOutline class="w-5 h-5" />
         </button>
         <button
-          class="text-slate-400 hover:text-blue-400 transition-colors duration-300"
-          aria-label="Share"
+          class="icon-button"
+          aria-label="Share this response"
         >
           <ShareNodesSolid class="w-5 h-5" />
         </button>
         <button
-          class="text-slate-400 hover:text-blue-400 transition-colors duration-300"
-          aria-label="Download"
+          class="icon-button"
+          aria-label="Download response data"
         >
           <DownloadSolid class="w-5 h-5" />
         </button>

@@ -1,4 +1,5 @@
 import flowbite from 'flowbite/plugin';
+import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -13,6 +14,6 @@ export default {
       }
     }
   },
-  plugins: [flowbite, require('@tailwindcss/forms')],
+  plugins: [flowbite, forms],
   darkMode: 'class'
 };

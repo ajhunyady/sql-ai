@@ -4,8 +4,9 @@
 	import ChatHistoryItem from './ChatHistoryItem.svelte';
 </script>
 
-<div
+<nav
 	class="fixed top-20 left-0 w-72 h-full backdrop-blur-xl bg-slate-950/80 border-r border-blue-500/20"
+	aria-label="Chat navigation"
 >
 	<div class="p-6">
 		<!-- Search Box -->
@@ -25,7 +26,8 @@
 		<!-- New Chat Button -->
 		<Button
 			color="blue"
-			class="w-full px-4 py-3 mb-8 flex items-center justify-center text-sm font-medium transition-all duration-300 transform hover:scale-105"
+			class="w-full px-4 py-3 mb-8 flex items-center justify-center text-sm font-medium button-hover"
+			aria-label="Start a new conversation"
 		>
 			<PlusOutline class="mr-2" />
 			New Conversation
@@ -38,7 +40,7 @@
 				Recent Chats
 			</h3>
 		</div>
-		<div class="space-y-2 max-h-96 overflow-y-auto">
+		<div class="space-y-2 max-h-96 overflow-y-auto" role="list" aria-label="Recent conversations">
 			<ChatHistoryItem
 				title="Top 5 customers by revenue"
 				time="Today, 3:42 PM"
@@ -52,5 +54,5 @@
 			<ChatHistoryItem title="Market share insights" time="Aug 8, 2025" />
 			<ChatHistoryItem title="Inventory turnover rates" time="Aug 7, 2025" />
 		</div>
-	</div>
+	</nav>
 </div>
