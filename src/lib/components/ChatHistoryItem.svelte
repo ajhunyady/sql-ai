@@ -6,16 +6,16 @@
 </script>
 
 <div class="w-full">
-  <div class="w-full p-3 chat-hover rounded-xl cursor-pointer" color={active ? "dark" : ""}>
-    <div class="text-left">
-      <p class="text-sm font-medium text-slate-200">{title}</p>
-      <p class="text-xs text-slate-400 mt-1 flex items-center">
-        <i
-          class="fa-solid fa-circle text-green-500 text-xs mr-2 pulse-animation"
-          class:hidden={!active}
-        ></i>
-        {time}
-      </p>
-    </div>
+  <div
+    class="p-3 chat-hover rounded-xl cursor-pointer"
+    class:border-l-2={active}
+    class:border-dark-blue-500={active}
+    class:bg-dark-blue-500-10={active}
+  >
+    <p class="text-sm font-medium text-slate-200">{title}</p>
+    <p class="text-xs text-slate-400 mt-1 flex items-center">
+      <i class="fa-solid fa-circle text-green-500 text-xs mr-2 pulse-animation" class:hidden={!active}></i>
+      {time}
+    </p>
   </div>
 </div>

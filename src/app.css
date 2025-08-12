@@ -1,13 +1,12 @@
-@import 'flowbite/dist/flowbite.min.css';
 @import 'tailwindcss';
+
+@plugin 'flowbite/plugin';
+
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
 ::-webkit-scrollbar {
   display: none;
-}
-body {
-  font-family: 'Inter', sans-serif;
 }
 .gradient-border {
   background: linear-gradient(135deg, #3b82f6, #1e40af, #1e3a8a);
