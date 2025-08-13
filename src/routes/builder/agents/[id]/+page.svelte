@@ -1,11 +1,15 @@
 <script>
-	import AgentEditor from '$lib/components/builder/AgentEditor.svelte';
-	import BuilderSidebar from '$lib/components/builder/BuilderSidebar.svelte';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+
+	onMount(() => {
+		const agentId = $page.params.id;
+		goto(`/builder/agents/${agentId}/metadata`, { replaceState: true });
+	});
 </script>
 
-<div class="flex">
-	<BuilderSidebar />
-	<main class="ml-72 flex w-full flex-col items-center px-6 py-8">
-		<AgentEditor />
-	</main>
+<!-- This page redirects to the metadata tab -->
+<div class="flex min-h-screen items-center justify-center">
+	<div class="text-slate-400">Redirecting...</div>
 </div>

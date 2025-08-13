@@ -1,20 +1,18 @@
 <script lang="ts">
-	import { Button, GradientButton, Avatar } from 'flowbite-svelte';
+	import { Button, ButtonGroup, Avatar } from 'flowbite-svelte';
 	import { CogSolid, ChevronDownOutline } from 'flowbite-svelte-icons';
 	import logo from '$lib/assets/coagent.png';
 	import { AVATAR_URL, APP_NAME } from '$lib/constants';
-	import { page } from '$app/state';
+	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 
 	// Determine active section based on current route
 	$: activeSection =
-		page.url.pathname === '/analyst'
+		$page.url.pathname === '/analyst'
 			? 'analyst'
-			: page.url.pathname === '/builder'
+			: $page.url.pathname === '/builder'
 				? 'builder'
-				: page.url.pathname === '/demo'
-					? 'demo'
-					: 'analyst';
+				: 'analyst';
 
 	function navigateToSection(section: string) {
 		goto(`/${section}`);
@@ -28,8 +26,8 @@
 				<img src={logo} alt="Coagent Logo" class="mr-3 h-8 w-8" />
 				<span class="gradient-text">{APP_NAME}</span>
 			</div>
-			<div class="hidden space-x-1 text-sm md:flex">
-				<div class="flex overflow-hidden rounded-xl bg-slate-900">
+			<div class="hidden text-sm md:flex">
+				<ButtonGroup class="rounded-xl bg-slate-900">
 					<Button
 						color={activeSection === 'analyst' ? 'blue' : 'gray'}
 						class="px-6 py-2 {activeSection === 'analyst'
@@ -44,14 +42,7 @@
 							: 'text-slate-400 hover:bg-slate-800 hover:text-white'} transition-all duration-300"
 						onclick={() => navigateToSection('builder')}>Builder</Button
 					>
-					<Button
-						color={activeSection === 'demo' ? 'blue' : 'gray'}
-						class="px-6 py-2 {activeSection === 'demo'
-							? ''
-							: 'text-slate-400 hover:bg-slate-800 hover:text-white'} transition-all duration-300"
-						onclick={() => navigateToSection('demo')}>Demo</Button
-					>
-				</div>
+				</ButtonGroup>
 			</div>
 		</div>
 		<div class="flex items-center space-x-3">

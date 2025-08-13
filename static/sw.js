@@ -24,7 +24,7 @@ class Logger {
     };
 
     this.logs.push(entry);
-    
+
     // Keep only recent logs
     if (this.logs.length > this.maxLogs) {
       this.logs = this.logs.slice(-this.maxLogs);
@@ -32,7 +32,7 @@ class Logger {
 
     // Send to clients for debugging
     this.sendToClients(entry);
-    
+
     // Console output for development
     console.log(`[SW ${level.toUpperCase()}] ${message}`, data || '');
   }
@@ -134,7 +134,7 @@ class DatabaseManager {
 
       request.onupgradeneeded = (event) => {
         const db = event.target.result;
-        
+
         // Create stores if they don't exist
         if (!db.objectStoreNames.contains('agents')) {
           const agentStore = db.createObjectStore('agents', { keyPath: 'id' });
@@ -361,7 +361,7 @@ function initializeDemoData() {
 async function loadData() {
   try {
     await dbManager.init();
-    
+
     // Try to load from IndexedDB
     const storedAgents = await dbManager.getAll('agents');
     const storedProviders = await dbManager.getAll('llmProviders');
@@ -400,7 +400,7 @@ async function loadData() {
 async function saveData() {
   try {
     await dbManager.init();
-    
+
     // Clear existing data
     await dbManager.clearStore('agents');
     await dbManager.clearStore('llmProviders');
@@ -410,11 +410,11 @@ async function saveData() {
     for (const agent of agents) {
       await dbManager.create('agents', agent);
     }
-    
+
     for (const provider of llmProviders) {
       await dbManager.create('llmProviders', provider);
     }
-    
+
     for (const datastore of datastores) {
       await dbManager.create('datastores', datastore);
     }
@@ -459,14 +459,14 @@ function interceptRequest(request, requestId) {
     url: request.url,
     headers: Object.fromEntries(request.headers.entries())
   }, requestId);
-  
+
   performanceMonitor.startRequest(requestId);
 }
 
 // Response interceptor for logging
 function interceptResponse(response, requestId) {
   performanceMonitor.endRequest(requestId);
-  
+
   logger.debug(`Response for request ${requestId}`, {
     status: response.status,
     statusText: response.statusText
@@ -504,7 +504,7 @@ async function handleAgents(request, url) {
         const postData = await request.json().catch(error => {
           throw new Error('Invalid JSON in request body');
         });
-        
+
         const newAgent = {
           id: generateId(),
           ...postData,
@@ -512,10 +512,10 @@ async function handleAgents(request, url) {
           updatedAt: new Date().toISOString(),
           isActive: true
         };
-        
+
         agents.push(newAgent);
         await saveData();
-        
+
         logger.info('Created new agent', { id: newAgent.id, name: newAgent.name }, requestId);
         const createdResponse = createResponse(newAgent, 201);
         interceptResponse(createdResponse, requestId);
@@ -527,11 +527,11 @@ async function handleAgents(request, url) {
           interceptResponse(response, requestId);
           return response;
         }
-        
+
         const putData = await request.json().catch(error => {
           throw new Error('Invalid JSON in request body');
         });
-        
+
         const index = agents.findIndex(a => a.id === agentId);
         if (index === -1) {
           const response = createErrorResponse('Agent not found', 404, requestId);
@@ -545,10 +545,10 @@ async function handleAgents(request, url) {
           id: agentId,
           updatedAt: new Date().toISOString()
         };
-        
+
         agents[index] = updatedAgent;
         await saveData();
-        
+
         logger.info('Updated agent', { id: agentId, name: updatedAgent.name }, requestId);
         const updatedResponse = createResponse(updatedAgent);
         interceptResponse(updatedResponse, requestId);
@@ -560,7 +560,7 @@ async function handleAgents(request, url) {
           interceptResponse(response, requestId);
           return response;
         }
-        
+
         const deleteIndex = agents.findIndex(a => a.id === agentId);
         if (deleteIndex === -1) {
           const response = createErrorResponse('Agent not found', 404, requestId);
@@ -571,11 +571,50 @@ async function handleAgents(request, url) {
         const deletedAgent = agents[deleteIndex];
         agents.splice(deleteIndex, 1);
         await saveData();
-        
+
         logger.info('Deleted agent', { id: agentId, name: deletedAgent.name }, requestId);
         const deletedResponse = createResponse({ success: true });
         interceptResponse(deletedResponse, requestId);
         return deletedResponse;
+
+      case 'PATCH':
+        if (!agentId) {
+          const response = createErrorResponse('Agent ID required', 400, requestId);
+          interceptResponse(response, requestId);
+          return response;
+        }
+
+        // Check for status endpoint
+        if (pathParts[4] === 'status') {
+          const patchData = await request.json().catch(error => {
+            throw new Error('Invalid JSON in request body');
+          });
+
+          const index = agents.findIndex(a => a.id === agentId);
+          if (index === -1) {
+            const response = createErrorResponse('Agent not found', 404, requestId);
+            interceptResponse(response, requestId);
+            return response;
+          }
+
+          const updatedAgent = {
+            ...agents[index],
+            isActive: patchData.isActive,
+            updatedAt: new Date().toISOString()
+          };
+
+          agents[index] = updatedAgent;
+          await saveData();
+
+          logger.info('Updated agent status', { id: agentId, isActive: updatedAgent.isActive }, requestId);
+          const statusResponse = createResponse(updatedAgent);
+          interceptResponse(statusResponse, requestId);
+          return statusResponse;
+        } else {
+          const response = createErrorResponse('Invalid PATCH endpoint', 400, requestId);
+          interceptResponse(response, requestId);
+          return response;
+        }
 
       default:
         const methodNotAllowedResponse = createErrorResponse('Method not allowed', 405, requestId);
@@ -620,7 +659,7 @@ async function handleLLMProviders(request, url) {
         const postData = await request.json().catch(error => {
           throw new Error('Invalid JSON in request body');
         });
-        
+
         const newProvider = {
           id: generateId(),
           ...postData,
@@ -628,10 +667,10 @@ async function handleLLMProviders(request, url) {
           updatedAt: new Date().toISOString(),
           isActive: true
         };
-        
+
         llmProviders.push(newProvider);
         await saveData();
-        
+
         logger.info('Created new LLM provider', { id: newProvider.id, name: newProvider.name }, requestId);
         const createdProviderResponse = createResponse(newProvider, 201);
         interceptResponse(createdProviderResponse, requestId);
@@ -643,11 +682,11 @@ async function handleLLMProviders(request, url) {
           interceptResponse(response, requestId);
           return response;
         }
-        
+
         const putData = await request.json().catch(error => {
           throw new Error('Invalid JSON in request body');
         });
-        
+
         const index = llmProviders.findIndex(p => p.id === providerId);
         if (index === -1) {
           const response = createErrorResponse('Provider not found', 404, requestId);
@@ -661,10 +700,10 @@ async function handleLLMProviders(request, url) {
           id: providerId,
           updatedAt: new Date().toISOString()
         };
-        
+
         llmProviders[index] = updatedProvider;
         await saveData();
-        
+
         logger.info('Updated LLM provider', { id: providerId, name: updatedProvider.name }, requestId);
         const updatedProviderResponse = createResponse(updatedProvider);
         interceptResponse(updatedProviderResponse, requestId);
@@ -676,7 +715,7 @@ async function handleLLMProviders(request, url) {
           interceptResponse(response, requestId);
           return response;
         }
-        
+
         const deleteIndex = llmProviders.findIndex(p => p.id === providerId);
         if (deleteIndex === -1) {
           const response = createErrorResponse('Provider not found', 404, requestId);
@@ -687,7 +726,7 @@ async function handleLLMProviders(request, url) {
         const deletedProvider = llmProviders[deleteIndex];
         llmProviders.splice(deleteIndex, 1);
         await saveData();
-        
+
         logger.info('Deleted LLM provider', { id: providerId, name: deletedProvider.name }, requestId);
         const deletedProviderResponse = createResponse({ success: true });
         interceptResponse(deletedProviderResponse, requestId);
@@ -736,7 +775,7 @@ async function handleDatastores(request, url) {
         const postData = await request.json().catch(error => {
           throw new Error('Invalid JSON in request body');
         });
-        
+
         const newDatastore = {
           id: generateId(),
           ...postData,
@@ -744,10 +783,10 @@ async function handleDatastores(request, url) {
           updatedAt: new Date().toISOString(),
           isActive: true
         };
-        
+
         datastores.push(newDatastore);
         await saveData();
-        
+
         logger.info('Created new datastore', { id: newDatastore.id, name: newDatastore.name }, requestId);
         const createdDatastoreResponse = createResponse(newDatastore, 201);
         interceptResponse(createdDatastoreResponse, requestId);
@@ -759,11 +798,11 @@ async function handleDatastores(request, url) {
           interceptResponse(response, requestId);
           return response;
         }
-        
+
         const putData = await request.json().catch(error => {
           throw new Error('Invalid JSON in request body');
         });
-        
+
         const index = datastores.findIndex(d => d.id === datastoreId);
         if (index === -1) {
           const response = createErrorResponse('Datastore not found', 404, requestId);
@@ -777,10 +816,10 @@ async function handleDatastores(request, url) {
           id: datastoreId,
           updatedAt: new Date().toISOString()
         };
-        
+
         datastores[index] = updatedDatastore;
         await saveData();
-        
+
         logger.info('Updated datastore', { id: datastoreId, name: updatedDatastore.name }, requestId);
         const updatedDatastoreResponse = createResponse(updatedDatastore);
         interceptResponse(updatedDatastoreResponse, requestId);
@@ -792,7 +831,7 @@ async function handleDatastores(request, url) {
           interceptResponse(response, requestId);
           return response;
         }
-        
+
         const deleteIndex = datastores.findIndex(d => d.id === datastoreId);
         if (deleteIndex === -1) {
           const response = createErrorResponse('Datastore not found', 404, requestId);
@@ -803,7 +842,7 @@ async function handleDatastores(request, url) {
         const deletedDatastore = datastores[deleteIndex];
         datastores.splice(deleteIndex, 1);
         await saveData();
-        
+
         logger.info('Deleted datastore', { id: datastoreId, name: deletedDatastore.name }, requestId);
         const deletedDatastoreResponse = createResponse({ success: true });
         interceptResponse(deletedDatastoreResponse, requestId);
@@ -840,7 +879,7 @@ async function handleValidation(request, url) {
 
     // Simulate validation (always returns success after a delay)
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     const response = createResponse({ valid: true, message: 'Connection successful' });
     interceptResponse(response, requestId);
     return response;
@@ -890,7 +929,7 @@ async function handleManagement(request, url) {
         datastores = [];
         initializeDemoData();
         await saveData();
-        
+
         logger.info('Cleared all data and reset to demo data', null, requestId);
         const clearResponse = createResponse({ success: true });
         interceptResponse(clearResponse, requestId);
@@ -903,7 +942,7 @@ async function handleManagement(request, url) {
         datastores = [];
         initializeDemoData();
         await saveData();
-        
+
         // Clear logs and reset metrics
         logger.logs = [];
         performanceMonitor.metrics = {
@@ -912,7 +951,7 @@ async function handleManagement(request, url) {
           errorCount: 0,
           lastUpdated: new Date().toISOString()
         };
-        
+
         logger.info('Service worker reset to initial state', null, requestId);
         const resetResponse = createResponse({ success: true });
         interceptResponse(resetResponse, requestId);
@@ -1047,14 +1086,14 @@ self.addEventListener('install', event => {
 const startTime = Date.now();
 self.addEventListener('activate', event => {
   logger.info('Activating service worker...');
-  
+
   // Take control of all clients immediately
   event.waitUntil(clients.claim());
-  
+
   // Initialize data
   event.waitUntil(loadData().catch(error => {
     logger.error('Failed to initialize data during activation', error);
   }));
-  
+
   logger.info('Service worker activated successfully');
 });

@@ -93,6 +93,27 @@ export async function deleteAgent(id: string): Promise<boolean> {
 	}
 }
 
+// Update agent status (active/inactive)
+export async function updateAgentStatus(id: string, isActive: boolean): Promise<Agent | null> {
+	agentsError.set(null);
+
+	try {
+		const updatedAgent = await agentApi.updateStatus(id, isActive);
+
+		// Update the local store
+		agents.update((currentAgents) =>
+			currentAgents.map((agent) => (agent.id === id ? updatedAgent : agent))
+		);
+
+		return updatedAgent;
+	} catch (error) {
+		const message = error instanceof Error ? error.message : 'Failed to update agent status';
+		agentsError.set(message);
+		console.error('Error updating agent status:', error);
+		return null;
+	}
+}
+
 // Initialize the store by loading agents
 if (typeof window !== 'undefined') {
 	loadAgents();
