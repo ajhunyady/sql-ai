@@ -34,9 +34,9 @@
 		custom: 'your-custom-connection-string'
 	};
 
-	onMount(() => {
-		if (!isNew) {
-			datastore = getDatastoreById(datastoreId);
+	onMount(async () => {
+		if (!isNew && datastoreId) {
+			datastore = await getDatastoreById(datastoreId);
 			if (datastore) {
 				formData = {
 					name: datastore.name,
@@ -103,9 +103,9 @@
 
 		try {
 			if (isNew) {
-				createDatastore(formData);
-			} else {
-				updateDatastore(datastoreId, formData);
+				await createDatastore(formData);
+			} else if (datastoreId) {
+				await updateDatastore(datastoreId, formData);
 			}
 			success = true;
 			setTimeout(() => {
@@ -158,7 +158,6 @@
 		<!-- Success Message -->
 		{#if success}
 			<Alert color="green" class="mb-6">
-				<CheckOutline slot="icon" class="h-4 w-4" />
 				Datastore {isNew ? 'created' : 'updated'} successfully! Redirecting...
 			</Alert>
 		{/if}
@@ -166,7 +165,6 @@
 		<!-- Error Message -->
 		{#if error}
 			<Alert color="red" class="mb-6">
-				<ExclamationCircleSolid slot="icon" class="h-4 w-4" />
 				{error}
 			</Alert>
 		{/if}

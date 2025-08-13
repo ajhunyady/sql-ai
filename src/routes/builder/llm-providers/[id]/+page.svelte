@@ -44,16 +44,16 @@
 		custom: []
 	};
 
-	onMount(() => {
-		if (!isNew) {
-			provider = getLLMProviderById(providerId);
+	onMount(async () => {
+		if (!isNew && providerId) {
+			provider = await getLLMProviderById(providerId);
 			if (provider) {
 				formData = {
 					name: provider.name,
 					type: provider.type,
+					modelName: provider.modelName,
 					apiKey: provider.apiKey || '',
-					baseUrl: provider.baseUrl || '',
-					modelName: provider.modelName
+					baseUrl: provider.baseUrl || ''
 				};
 			} else {
 				error = 'Provider not found';
@@ -115,9 +115,9 @@
 
 		try {
 			if (isNew) {
-				createLLMProvider(formData);
-			} else {
-				updateLLMProvider(providerId, formData);
+				await createLLMProvider(formData);
+			} else if (providerId) {
+				await updateLLMProvider(providerId, formData);
 			}
 			success = true;
 			setTimeout(() => {
@@ -132,9 +132,21 @@
 
 	// Update model suggestions when provider type changes
 	$effect(() => {
-		if (formData.type && modelOptions[formData.type].length > 0) {
-			if (!formData.modelName || !modelOptions[formData.type].includes(formData.modelName)) {
-				formData.modelName = modelOptions[formData.type][0];
+		if (formData.type === 'openai' && modelOptions.openai.length > 0) {
+			if (!formData.modelName || !modelOptions.openai.includes(formData.modelName)) {
+				formData.modelName = modelOptions.openai[0];
+			}
+		} else if (formData.type === 'anthropic' && modelOptions.anthropic.length > 0) {
+			if (!formData.modelName || !modelOptions.anthropic.includes(formData.modelName)) {
+				formData.modelName = modelOptions.anthropic[0];
+			}
+		} else if (formData.type === 'xai' && modelOptions.xai.length > 0) {
+			if (!formData.modelName || !modelOptions.xai.includes(formData.modelName)) {
+				formData.modelName = modelOptions.xai[0];
+			}
+		} else if (formData.type === 'ollama' && modelOptions.ollama.length > 0) {
+			if (!formData.modelName || !modelOptions.ollama.includes(formData.modelName)) {
+				formData.modelName = modelOptions.ollama[0];
 			}
 		}
 	});
@@ -178,15 +190,12 @@
 		<!-- Success Message -->
 		{#if success}
 			<Alert color="green" class="mb-6">
-				<CheckOutline slot="icon" class="h-4 w-4" />
 				Provider {isNew ? 'created' : 'updated'} successfully! Redirecting...
 			</Alert>
 		{/if}
 
-		<!-- Error Message -->
 		{#if error}
 			<Alert color="red" class="mb-6">
-				<ExclamationCircleSolid slot="icon" class="h-4 w-4" />
 				{error}
 			</Alert>
 		{/if}

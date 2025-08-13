@@ -1,94 +1,99 @@
+import { writable } from 'svelte/store';
 import type { Agent, AgentFormData } from '$lib/models/agent';
-import { browser } from '$app/environment';
+import { agentApi } from '$lib/services/api';
 
-// In a real app, this would be replaced with actual API calls
-let agents: Agent[] = [
-  {
-    id: '1',
-    name: 'Sales Assistant',
-    description: 'Helps analyze sales data and generate reports',
-    createdAt: new Date('2023-01-15'),
-    updatedAt: new Date('2023-01-20'),
-    llmProviderId: 'openai-1',
-    datastoreIds: ['postgres-1'],
-    guidance: {
-      generalInstructions: 'You are a sales data assistant. Help users analyze sales trends and generate reports.',
-      tableSemantics: {
-        sales: 'Contains sales transaction data with product, customer, and revenue information',
-        products: 'Product catalog with pricing and category information'
-      },
-      customPrompts: [
-        'Generate a monthly sales report',
-        'Identify top performing products'
-      ]
-    },
-    isActive: true
-  },
-  {
-    id: '2',
-    name: 'Customer Support Bot',
-    description: 'Answers customer questions using knowledge base',
-    createdAt: new Date('2023-02-10'),
-    updatedAt: new Date('2023-02-15'),
-    llmProviderId: 'anthropic-1',
-    datastoreIds: ['surrealdb-1'],
-    guidance: {
-      generalInstructions: 'You are a customer support assistant. Answer questions based on the knowledge base.',
-      tableSemantics: {
-        faq: 'Frequently asked questions and answers',
-        tickets: 'Customer support tickets with resolution status'
-      },
-      customPrompts: [
-        'How do I reset my password?',
-        'What is your return policy?'
-      ]
-    },
-    isActive: true
-  }
-];
+// Create writable stores for agents data and loading state
+export const agents = writable<Agent[]>([]);
+export const agentsLoading = writable<boolean>(false);
+export const agentsError = writable<string | null>(null);
 
-function generateId(): string {
-  return Math.random().toString(36).substr(2, 9);
+// Load all agents from the service worker
+export async function loadAgents(): Promise<void> {
+	agentsLoading.set(true);
+	agentsError.set(null);
+
+	try {
+		const data = await agentApi.getAll();
+		agents.set(data);
+	} catch (error) {
+		const message = error instanceof Error ? error.message : 'Failed to load agents';
+		agentsError.set(message);
+		console.error('Error loading agents:', error);
+	} finally {
+		agentsLoading.set(false);
+	}
 }
 
-export function getAgents(): Agent[] {
-  return agents;
+// Get a single agent by ID
+export async function getAgentById(id: string): Promise<Agent | null> {
+	try {
+		return await agentApi.getById(id);
+	} catch (error) {
+		console.error('Error getting agent:', error);
+		return null;
+	}
 }
 
-export function getAgentById(id: string): Agent | undefined {
-  return agents.find(agent => agent.id === id);
+// Create a new agent
+export async function createAgent(data: AgentFormData): Promise<Agent | null> {
+	agentsError.set(null);
+
+	try {
+		const newAgent = await agentApi.create(data);
+
+		// Update the local store
+		agents.update((currentAgents) => [...currentAgents, newAgent]);
+
+		return newAgent;
+	} catch (error) {
+		const message = error instanceof Error ? error.message : 'Failed to create agent';
+		agentsError.set(message);
+		console.error('Error creating agent:', error);
+		return null;
+	}
 }
 
-export function createAgent(data: AgentFormData): Agent {
-  const newAgent: Agent = {
-    id: generateId(),
-    ...data,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    isActive: true
-  };
-  
-  agents = [...agents, newAgent];
-  return newAgent;
+// Update an existing agent
+export async function updateAgent(id: string, data: AgentFormData): Promise<Agent | null> {
+	agentsError.set(null);
+
+	try {
+		const updatedAgent = await agentApi.update(id, data);
+
+		// Update the local store
+		agents.update((currentAgents) =>
+			currentAgents.map((agent) => (agent.id === id ? updatedAgent : agent))
+		);
+
+		return updatedAgent;
+	} catch (error) {
+		const message = error instanceof Error ? error.message : 'Failed to update agent';
+		agentsError.set(message);
+		console.error('Error updating agent:', error);
+		return null;
+	}
 }
 
-export function updateAgent(id: string, data: AgentFormData): Agent | undefined {
-  const index = agents.findIndex(agent => agent.id === id);
-  if (index === -1) return undefined;
-  
-  const updatedAgent: Agent = {
-    ...agents[index],
-    ...data,
-    id: agents[index].id, // Preserve the original ID
-    updatedAt: new Date()
-  };
-  
-  agents = [...agents.slice(0, index), updatedAgent, ...agents.slice(index + 1)];
-  return updatedAgent;
+// Delete an agent
+export async function deleteAgent(id: string): Promise<boolean> {
+	agentsError.set(null);
+
+	try {
+		await agentApi.delete(id);
+
+		// Update the local store
+		agents.update((currentAgents) => currentAgents.filter((agent) => agent.id !== id));
+
+		return true;
+	} catch (error) {
+		const message = error instanceof Error ? error.message : 'Failed to delete agent';
+		agentsError.set(message);
+		console.error('Error deleting agent:', error);
+		return false;
+	}
 }
 
-export function deleteAgent(id: string): boolean {
-  const initialLength = agents.length;
-  agents = agents.filter(agent => agent.id !== id);
-  return agents.length !== initialLength;
+// Initialize the store by loading agents
+if (typeof window !== 'undefined') {
+	loadAgents();
 }
