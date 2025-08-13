@@ -1,5 +1,10 @@
 <script>
-	import BuilderSection from '$lib/components/builder/BuilderSection.svelte';
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+
+	onMount(() => {
+		goto('/builder/agents', { replaceState: true });
+	});
 </script>
 
-<BuilderSection />
+<!-- This page redirects to the agents page -->

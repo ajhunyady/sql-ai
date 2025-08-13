@@ -5,6 +5,12 @@
             "args": [
                 "mcp-svelte-docs"
             ]
+        },
+        "context7": {
+            "command": "pnpx",
+            "args": [
+                "@upstash/context7-mcp"
+            ]
         }
     }
 }
