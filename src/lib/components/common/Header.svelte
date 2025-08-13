@@ -27,19 +27,13 @@
 				<span class="gradient-text">{APP_NAME}</span>
 			</div>
 			<div class="hidden text-sm md:flex">
-				<ButtonGroup class="rounded-xl bg-slate-900">
+				<ButtonGroup>
 					<Button
 						color={activeSection === 'analyst' ? 'blue' : 'gray'}
-						class="px-6 py-2 {activeSection === 'analyst'
-							? ''
-							: 'text-slate-400 hover:bg-slate-800 hover:text-white'} transition-all duration-300"
 						onclick={() => navigateToSection('analyst')}>Analyst</Button
 					>
 					<Button
 						color={activeSection === 'builder' ? 'blue' : 'gray'}
-						class="px-6 py-2 {activeSection === 'builder'
-							? ''
-							: 'text-slate-400 hover:bg-slate-800 hover:text-white'} transition-all duration-300"
 						onclick={() => navigateToSection('builder')}>Builder</Button
 					>
 				</ButtonGroup>
