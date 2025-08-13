@@ -7,10 +7,21 @@
 	import {
 		getLLMProviderById,
 		createLLMProvider,
-		updateLLMProvider
+		updateLLMProvider,
+		llmProviders
 	} from '$lib/stores/llm-providers';
-	import type { LLMProvider, LLMProviderFormData, LLMProviderType } from '$lib/models/llm-provider';
+	import type { LLMProvider, LLMProviderFormData } from '$lib/models/llm-provider';
 	import BuilderSidebar from '$lib/components/builder/BuilderSidebar.svelte';
+	import {
+		providerTypes,
+		modelOptions,
+		initializeFormState,
+		validateForm,
+		requiresApiKey,
+		requiresBaseUrl,
+		prepareFormDataForSubmission,
+		updateModelNameOnChange
+	} from '$lib/utils/llm-provider-form';
 
 	let providerId = $state(page.params.id);
 	let isNew = $state(providerId === 'new');
@@ -20,41 +31,13 @@
 	let success = $state(false);
 
 	// Form data
-	let formData = $state<LLMProviderFormData>({
-		name: '',
-		type: 'openai',
-		apiKey: '',
-		baseUrl: '',
-		modelName: ''
-	});
-
-	const providerTypes: { value: LLMProviderType; name: string }[] = [
-		{ value: 'openai', name: 'OpenAI' },
-		{ value: 'anthropic', name: 'Anthropic' },
-		{ value: 'xai', name: 'xAI' },
-		{ value: 'ollama', name: 'Ollama' },
-		{ value: 'custom', name: 'Custom' }
-	];
-
-	const modelOptions = {
-		openai: ['gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo', 'gpt-4o', 'gpt-4o-mini'],
-		anthropic: ['claude-3-opus', 'claude-3-sonnet', 'claude-3-haiku', 'claude-3-5-sonnet'],
-		xai: ['grok-beta'],
-		ollama: ['llama3', 'llama3:8b', 'llama3:70b', 'mistral', 'codellama'],
-		custom: []
-	};
+	let formData = $state(initializeFormState($llmProviders));
 
 	onMount(async () => {
 		if (!isNew && providerId) {
 			provider = await getLLMProviderById(providerId);
 			if (provider) {
-				formData = {
-					name: provider.name,
-					type: provider.type,
-					modelName: provider.modelName,
-					apiKey: provider.apiKey || '',
-					baseUrl: provider.baseUrl || ''
-				};
+				formData = initializeFormState($llmProviders, provider);
 			} else {
 				error = 'Provider not found';
 			}
@@ -67,44 +50,20 @@
 
 	function resetForm() {
 		if (isNew) {
-			formData = {
-				name: '',
-				type: 'openai',
-				apiKey: '',
-				baseUrl: '',
-				modelName: ''
-			};
+			formData = initializeFormState($llmProviders);
 		} else if (provider) {
-			formData = {
-				name: provider.name,
-				type: provider.type,
-				apiKey: provider.apiKey || '',
-				baseUrl: provider.baseUrl || '',
-				modelName: provider.modelName
-			};
+			formData = initializeFormState($llmProviders, provider);
 		}
 		error = null;
 	}
 
-	function validateForm(): string | null {
-		if (!formData.name.trim()) {
-			return 'Provider name is required';
-		}
-		if (!formData.modelName.trim()) {
-			return 'Model name is required';
-		}
-		if (formData.type !== 'ollama' && !formData.apiKey?.trim()) {
-			return 'API key is required for this provider type';
-		}
-		if (formData.type === 'ollama' && !formData.baseUrl?.trim()) {
-			return 'Base URL is required for Ollama';
-		}
-		return null;
+	function validateFormLocal(): string | null {
+		return validateForm(formData);
 	}
 
 	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
-		const validationError = validateForm();
+		const validationError = validateFormLocal();
 		if (validationError) {
 			error = validationError;
 			return;
@@ -114,10 +73,12 @@
 		error = null;
 
 		try {
+			const submissionData = prepareFormDataForSubmission(formData);
+			
 			if (isNew) {
-				await createLLMProvider(formData);
+				await createLLMProvider(submissionData);
 			} else if (providerId) {
-				await updateLLMProvider(providerId, formData);
+				await updateLLMProvider(providerId, submissionData);
 			}
 			success = true;
 			setTimeout(() => {
@@ -132,32 +93,8 @@
 
 	// Update model suggestions when provider type changes
 	$effect(() => {
-		if (formData.type === 'openai' && modelOptions.openai.length > 0) {
-			if (!formData.modelName || !modelOptions.openai.includes(formData.modelName)) {
-				formData.modelName = modelOptions.openai[0];
-			}
-		} else if (formData.type === 'anthropic' && modelOptions.anthropic.length > 0) {
-			if (!formData.modelName || !modelOptions.anthropic.includes(formData.modelName)) {
-				formData.modelName = modelOptions.anthropic[0];
-			}
-		} else if (formData.type === 'xai' && modelOptions.xai.length > 0) {
-			if (!formData.modelName || !modelOptions.xai.includes(formData.modelName)) {
-				formData.modelName = modelOptions.xai[0];
-			}
-		} else if (formData.type === 'ollama' && modelOptions.ollama.length > 0) {
-			if (!formData.modelName || !modelOptions.ollama.includes(formData.modelName)) {
-				formData.modelName = modelOptions.ollama[0];
-			}
-		}
+		updateModelNameOnChange(formData);
 	});
-
-	function requiresApiKey(type: LLMProviderType): boolean {
-		return type !== 'ollama';
-	}
-
-	function requiresBaseUrl(type: LLMProviderType): boolean {
-		return type === 'ollama' || type === 'custom';
-	}
 </script>
 
 <svelte:head>
@@ -166,7 +103,7 @@
 
 <BuilderSidebar />
 
-<div class="ml-72 min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-8">
+<div class="ml-72 min-h-screen from-slate-950 via-slate-900 to-slate-950 p-8">
 	<div class="mx-auto max-w-4xl">
 		<!-- Header -->
 		<div class="mb-8">
@@ -201,20 +138,22 @@
 		{/if}
 
 		<!-- Form -->
-		<Card class="border-slate-700/50 bg-slate-900/50 backdrop-blur-xl">
+		<Card class="border-0 bg-slate-900/50">
 			<form onsubmit={handleSubmit} class="space-y-6">
-				<!-- Provider Name -->
-				<div>
-					<Label for="name" class="mb-2 text-slate-300">Provider Name *</Label>
-					<Input
-						id="name"
-						type="text"
-						bind:value={formData.name}
-						placeholder="Enter provider name..."
-						required
-						class="border-slate-600 bg-slate-800 text-slate-200 placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500"
-					/>
-				</div>
+				<!-- Provider Name (only for custom providers) -->
+				{#if formData.type === 'custom'}
+					<div>
+						<Label for="name" class="mb-2 text-slate-300">Provider Name *</Label>
+						<Input
+							id="name"
+							type="text"
+							bind:value={formData.name}
+							placeholder="Enter provider name..."
+							required
+							class="border-slate-600 bg-slate-800 text-slate-200 placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500"
+						/>
+					</div>
+				{/if}
 
 				<!-- Provider Type -->
 				<div>

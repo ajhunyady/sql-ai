@@ -134,7 +134,7 @@
 
 <BuilderSidebar />
 
-<div class="ml-72 min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-8">
+<div class="ml-72 min-h-screen from-slate-950 via-slate-900 to-slate-950 p-8">
 	<div class="mx-auto max-w-4xl">
 		<!-- Header -->
 		<div class="mb-8">
@@ -170,7 +170,7 @@
 		{/if}
 
 		<!-- Form -->
-		<Card class="border-slate-700/50 bg-slate-900/50 backdrop-blur-xl">
+		<Card class="border-0 bg-slate-900/50">
 			<form onsubmit={handleSubmit} class="space-y-6">
 				<!-- Datastore Name -->
 				<div>

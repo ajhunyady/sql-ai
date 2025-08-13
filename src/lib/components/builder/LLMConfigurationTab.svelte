@@ -2,7 +2,7 @@
 	import { Button, Select } from 'flowbite-svelte';
 	import { PlusOutline, CheckCircleSolid, TrashBinOutline } from 'flowbite-svelte-icons';
 	import type { Agent } from '$lib/models/agent';
-	import type { LLMProvider, LLMProviderType } from '$lib/models/llm-provider';
+	import type { LLMProvider } from '$lib/models/llm-provider';
 	import {
 		llmProviders,
 		validateLLMProvider,
@@ -10,17 +10,23 @@
 		updateLLMProvider,
 		deleteLLMProvider
 	} from '$lib/stores/llm-providers';
+	import {
+		providerTypeExists,
+		getAvailableProviderTypes,
+		allNonCustomProvidersExist,
+		generateProviderName,
+		requiresApiKey,
+		requiresBaseUrl,
+		initializeFormState,
+		prepareFormDataForSubmission,
+		providerTypes,
+		modelOptions
+	} from '$lib/utils/llm-provider-form';
 
 	let { agent = $bindable<Agent>() } = $props();
 	let showAddForm = $state(false);
 	let editingProviderId = $state<string | null>(null);
-	let newProvider = $state({
-		name: '',
-		type: 'openai' as LLMProviderType,
-		apiKey: '',
-		baseUrl: '',
-		modelName: ''
-	});
+	let newProvider = $state(initializeFormState($llmProviders));
 	let validationStatus = $state<Record<string, { validating: boolean; valid: boolean }>>({});
 
 	function selectProvider(providerId: string) {
@@ -36,37 +42,21 @@
 	function startEditing(providerId: string) {
 		const provider = $llmProviders.find((p: LLMProvider) => p.id === providerId);
 		if (provider) {
-			newProvider = {
-				name: provider.name,
-				type: provider.type,
-				apiKey: provider.apiKey || '',
-				baseUrl: provider.baseUrl || '',
-				modelName: provider.modelName
-			};
+			newProvider = initializeFormState($llmProviders, provider);
 			editingProviderId = providerId;
 			showAddForm = true;
 		}
 	}
 
 	function saveProvider() {
+		const formData = prepareFormDataForSubmission(newProvider);
+		
 		if (editingProviderId) {
 			// Update existing provider
-			updateLLMProvider(editingProviderId, {
-				name: newProvider.name,
-				type: newProvider.type,
-				apiKey: newProvider.apiKey,
-				baseUrl: newProvider.baseUrl,
-				modelName: newProvider.modelName
-			});
+			updateLLMProvider(editingProviderId, formData);
 		} else {
 			// Create new provider
-			createLLMProvider({
-				name: newProvider.name,
-				type: newProvider.type,
-				apiKey: newProvider.apiKey,
-				baseUrl: newProvider.baseUrl,
-				modelName: newProvider.modelName
-			});
+			createLLMProvider(formData);
 		}
 
 		// Reset form
@@ -80,13 +70,7 @@
 	function resetForm() {
 		showAddForm = false;
 		editingProviderId = null;
-		newProvider = {
-			name: '',
-			type: 'openai' as LLMProviderType,
-			apiKey: '',
-			baseUrl: '',
-			modelName: ''
-		};
+		newProvider = initializeFormState($llmProviders);
 	}
 
 	async function validateProvider(provider: LLMProvider) {
@@ -115,6 +99,7 @@
 				<Button
 					color="blue"
 					size="sm"
+					disabled={allNonCustomProvidersExist() && !editingProviderId}
 					onclick={() => {
 						resetForm();
 						showAddForm = true;
@@ -131,16 +116,18 @@
 						{editingProviderId ? 'Edit Provider' : 'Add New Provider'}
 					</h4>
 					<div class="space-y-4">
-						<div>
-							<label for="provider-name" class="mb-1 block text-sm text-slate-400">Name</label>
-							<input
-								id="provider-name"
-								bind:value={newProvider.name}
-								type="text"
-								placeholder="My LLM Provider"
-								class="w-full rounded border border-slate-700/50 bg-slate-900/50 px-3 py-2 text-slate-200"
-							/>
-						</div>
+						{#if newProvider.type === 'custom'}
+							<div>
+								<label for="provider-name" class="mb-1 block text-sm text-slate-400">Name</label>
+								<input
+									id="provider-name"
+									bind:value={newProvider.name}
+									type="text"
+									placeholder="My Custom Provider"
+									class="w-full rounded border border-slate-700/50 bg-slate-900/50 px-3 py-2 text-slate-200"
+								/>
+							</div>
+						{/if}
 						<div>
 							<label for="provider-type" class="mb-1 block text-sm text-slate-400">Type</label>
 							<select
@@ -148,36 +135,40 @@
 								bind:value={newProvider.type}
 								class="w-full rounded border border-slate-700/50 bg-slate-900/50 px-3 py-2 text-slate-200"
 							>
-								<option value="openai">OpenAI</option>
-								<option value="anthropic">Anthropic</option>
-								<option value="xai">xAI</option>
-								<option value="ollama">Ollama</option>
-								<option value="custom">Custom</option>
+								{#each getAvailableProviderTypes($llmProviders) as type}
+									{#each providerTypes as pt}
+										{#if pt.value === type}
+											<option value={type}>{pt.name}</option>
+										{/if}
+									{/each}
+								{/each}
 							</select>
 						</div>
 						<div>
 							<label for="model-name" class="mb-1 block text-sm text-slate-400">Model Name</label>
-							<input
-								id="model-name"
-								bind:value={newProvider.modelName}
-								type="text"
-								placeholder="gpt-4-turbo"
-								class="w-full rounded border border-slate-700/50 bg-slate-900/50 px-3 py-2 text-slate-200"
-							/>
-						</div>
-						<div>
-							<label for="api-key" class="mb-1 block text-sm text-slate-400">
-								{newProvider.type === 'ollama' ? 'Base URL' : 'API Key'}
-							</label>
-							{#if newProvider.type === 'ollama'}
+							{#if modelOptions[newProvider.type].length > 0}
+								<select
+									id="model-name"
+									bind:value={newProvider.modelName}
+									class="w-full rounded border border-slate-700/50 bg-slate-900/50 px-3 py-2 text-slate-200"
+								>
+									{#each modelOptions[newProvider.type] as model}
+										<option value={model}>{model}</option>
+									{/each}
+								</select>
+							{:else}
 								<input
-									id="api-key"
-									bind:value={newProvider.baseUrl}
+									id="model-name"
+									bind:value={newProvider.modelName}
 									type="text"
-									placeholder="http://localhost:11434"
+									placeholder="Enter model name..."
 									class="w-full rounded border border-slate-700/50 bg-slate-900/50 px-3 py-2 text-slate-200"
 								/>
-							{:else}
+							{/if}
+						</div>
+						{#if requiresApiKey(newProvider.type)}
+							<div>
+								<label for="api-key" class="mb-1 block text-sm text-slate-400">API Key</label>
 								<input
 									id="api-key"
 									bind:value={newProvider.apiKey}
@@ -185,8 +176,22 @@
 									placeholder="sk-..."
 									class="w-full rounded border border-slate-700/50 bg-slate-900/50 px-3 py-2 text-slate-200"
 								/>
-							{/if}
-						</div>
+							</div>
+						{/if}
+						{#if requiresBaseUrl(newProvider.type)}
+							<div>
+								<label for="base-url" class="mb-1 block text-sm text-slate-400">
+									Base URL {newProvider.type === 'ollama' ? '*' : ''}
+								</label>
+								<input
+									id="base-url"
+									bind:value={newProvider.baseUrl}
+									type="text"
+									placeholder={newProvider.type === 'ollama' ? 'http://localhost:11434' : 'https://api.example.com'}
+									class="w-full rounded border border-slate-700/50 bg-slate-900/50 px-3 py-2 text-slate-200"
+								/>
+							</div>
+						{/if}
 						<div class="flex space-x-2">
 							<Button color="blue" size="sm" onclick={saveProvider}>
 								{editingProviderId ? 'Update' : 'Add'} Provider

@@ -24,27 +24,27 @@
 	let isNewAgent = $derived(agentId === 'new');
 
 	// Create a new agent or load existing one
-	let agent = $state<Agent | undefined>();
+	let agent = $state<Agent>({
+		id: '',
+		name: '',
+		description: '',
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+		datastoreIds: [],
+		guidance: {
+			generalInstructions: '',
+			tableSemantics: {},
+			customPrompts: []
+		},
+		isActive: true
+	});
 
 	$effect(() => {
-		if (isNewAgent) {
-			agent = {
-				id: '',
-				name: '',
-				description: '',
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-				datastoreIds: [],
-				guidance: {
-					generalInstructions: '',
-					tableSemantics: {},
-					customPrompts: []
-				},
-				isActive: true
-			};
-		} else {
+		if (!isNewAgent) {
 			getAgentById(agentId).then((loadedAgent) => {
-				agent = loadedAgent || undefined;
+				if (loadedAgent) {
+					agent = loadedAgent;
+				}
 			});
 		}
 	});
@@ -159,54 +159,43 @@
 		</div>
 	</div>
 
-	{#if agent === undefined && !isNewAgent}
-		<div class="rounded-lg border border-red-500/30 bg-red-500/20 p-6 text-center">
-			<ExclamationCircleSolid class="mx-auto mb-4 h-12 w-12 text-red-500" />
-			<h2 class="mb-2 text-xl font-bold text-white">Agent Not Found</h2>
-			<p class="mb-4 text-slate-300">
-				The agent you're looking for doesn't exist or has been deleted.
-			</p>
-			<Button onclick={goBack} color="blue">Back to Builder</Button>
-		</div>
-	{:else}
-		<div class="overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900/50">
-			<!-- Tab Navigation -->
-			<div class="border-b border-slate-700/50">
-				<div class="flex overflow-x-auto">
-					{#each tabs as tab}
-						<button class={getTabClass(tab.id)} onclick={() => (activeTab = tab.id)}>
-							<div class="flex items-center">
-								{tab.label}
-								{#if tab.required && !isActiveTab(tab.id) && !isTabComplete(tab.id)}
-									<span class="ml-2 h-2 w-2 rounded-full bg-red-500"></span>
-								{/if}
-								{#if tab.required && !isActiveTab(tab.id) && isTabComplete(tab.id)}
-									<CheckCircleSolid class="ml-2 h-4 w-4 text-green-500" />
-								{/if}
-							</div>
-						</button>
-					{/each}
-				</div>
+	<div class="overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900/50">
+		<!-- Tab Navigation -->
+		<div class="border-b border-slate-700/50">
+			<div class="flex overflow-x-auto">
+				{#each tabs as tab}
+					<button class={getTabClass(tab.id)} onclick={() => (activeTab = tab.id)}>
+						<div class="flex items-center">
+							{tab.label}
+							{#if tab.required && !isActiveTab(tab.id) && !isTabComplete(tab.id)}
+								<span class="ml-2 h-2 w-2 rounded-full bg-red-500"></span>
+							{/if}
+							{#if tab.required && !isActiveTab(tab.id) && isTabComplete(tab.id)}
+								<CheckCircleSolid class="ml-2 h-4 w-4 text-green-500" />
+							{/if}
+						</div>
+					</button>
+				{/each}
 			</div>
+		</div>
 
-			<!-- Tab Content -->
-			<div class="p-6">
-				{#if activeTab === 'metadata'}
-					<MetadataTab bind:agent />
-				{:else if activeTab === 'data'}
-					<DataIntegrationsTab bind:agent />
-				{:else if activeTab === 'llm'}
-					<LLMConfigurationTab bind:agent />
-				{:else if activeTab === 'guidance'}
-					<QueryingGuidanceTab bind:agent />
-				{:else if activeTab === 'testing'}
-					<TestingTab bind:agent />
-				{:else if activeTab === 'evaluations'}
-					<EvaluationsTab bind:agent />
-				{:else if activeTab === 'monitoring'}
-					<MonitoringTab bind:agent />
-				{/if}
-			</div>
+		<!-- Tab Content -->
+		<div class="p-6">
+			{#if activeTab === 'metadata'}
+				<MetadataTab bind:agent />
+			{:else if activeTab === 'data'}
+				<DataIntegrationsTab bind:agent />
+			{:else if activeTab === 'llm'}
+				<LLMConfigurationTab bind:agent />
+			{:else if activeTab === 'guidance'}
+				<QueryingGuidanceTab bind:agent />
+			{:else if activeTab === 'testing'}
+				<TestingTab bind:agent />
+			{:else if activeTab === 'evaluations'}
+				<EvaluationsTab bind:agent />
+			{:else if activeTab === 'monitoring'}
+				<MonitoringTab bind:agent />
+			{/if}
 		</div>
-	{/if}
+	</div>
 </div>

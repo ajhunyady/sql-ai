@@ -45,11 +45,11 @@
       <div class="grid grid-cols-2 gap-4 text-sm">
         <div>
           <p class="text-slate-500">Created</p>
-          <p class="text-slate-300">{agent.createdAt.toLocaleDateString()}</p>
+          <p class="text-slate-300">{new Date(agent.createdAt).toLocaleDateString()}</p>
         </div>
         <div>
           <p class="text-slate-500">Last Updated</p>
-          <p class="text-slate-300">{agent.updatedAt.toLocaleDateString()}</p>
+          <p class="text-slate-300">{new Date(agent.updatedAt).toLocaleDateString()}</p>
         </div>
         <div>
           <p class="text-slate-500">Status</p>
