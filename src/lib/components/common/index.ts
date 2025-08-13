@@ -1,0 +1,3 @@
+// Common Components
+export { default as Header } from './Header.svelte';
+export { default as WelcomeSection } from './WelcomeSection.svelte';

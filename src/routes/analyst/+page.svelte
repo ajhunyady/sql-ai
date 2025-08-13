@@ -1,5 +1,5 @@
 <script>
-  import AnalystSection from '$lib/components/AnalystSection.svelte';
+	import AnalystSection from '$lib/components/analyst/AnalystSection.svelte';
 </script>
 
 <AnalystSection />
