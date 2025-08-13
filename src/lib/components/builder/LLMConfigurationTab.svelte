@@ -99,7 +99,7 @@
 				<Button
 					color="blue"
 					size="sm"
-					disabled={allNonCustomProvidersExist() && !editingProviderId}
+					disabled={!editingProviderId}
 					onclick={() => {
 						resetForm();
 						showAddForm = true;
