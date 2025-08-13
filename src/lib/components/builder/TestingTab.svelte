@@ -50,7 +50,7 @@
         <Textarea
           bind:value={testInput}
           placeholder="Enter a test query for your agent..."
-          rows="6"
+          rows={6}
           class="w-full bg-slate-900/50 border border-slate-700/50 rounded px-3 py-2 text-slate-200 mb-4"
         />
         <div class="flex justify-end">
@@ -74,8 +74,8 @@
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-medium text-slate-300">Test History</h3>
           {#if testHistory.length > 0}
-            <Button 
-              color="none" 
+            <Button
+              color="gray"
               size="sm"
               onclick={clearHistory}
             >

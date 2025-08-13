@@ -26,13 +26,13 @@
 			<div class="hidden md:flex space-x-1 text-sm">
 				<div class="bg-slate-900 rounded-xl overflow-hidden flex">
 					<Button
-						color={activeSection === 'analyst' ? 'blue' : 'none'}
+						color={activeSection === 'analyst' ? 'blue' : 'gray'}
 						class="px-6 py-2 {activeSection === 'analyst' ? '' : 'text-slate-400 hover:text-white hover:bg-slate-800'} transition-all duration-300"
 						onclick={() => navigateToSection('analyst')}
 						>Analyst</Button
 					>
 					<Button
-						color={activeSection === 'builder' ? 'blue' : 'none'}
+						color={activeSection === 'builder' ? 'blue' : 'gray'}
 						class="px-6 py-2 {activeSection === 'builder' ? '' : 'text-slate-400 hover:text-white hover:bg-slate-800'} transition-all duration-300"
 						onclick={() => navigateToSection('builder')}
 						>Builder</Button

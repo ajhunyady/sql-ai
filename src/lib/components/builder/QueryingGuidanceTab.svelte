@@ -33,7 +33,7 @@
   }
   
   function removeCustomPrompt(index: number) {
-    agent.guidance.customPrompts = agent.guidance.customPrompts.filter((_, i) => i !== index);
+    agent.guidance.customPrompts = agent.guidance.customPrompts.filter((_: string, i: number) => i !== index);
   }
 </script>
 
@@ -45,10 +45,9 @@
       <h3 class="text-lg font-medium text-slate-300 mb-4">General Instructions</h3>
       <Textarea
         id="general-instructions"
-        value={agent.guidance.generalInstructions}
-        on:input={(e) => agent.guidance.generalInstructions = e.target.value}
+        bind:value={agent.guidance.generalInstructions}
         placeholder="Provide general instructions for the agent..."
-        rows="8"
+        rows={8}
         class="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
       />
       <p class="mt-2 text-sm text-slate-500">
@@ -68,7 +67,7 @@ Table Semantics:
 ${Object.entries(agent.guidance.tableSemantics).map(([table, semantics]) => `- ${table}: ${semantics}`).join('\n') || "[No table semantics defined]"}
 
 Custom Prompts:
-${agent.guidance.customPrompts.map(prompt => `- ${prompt}`).join('\n') || "[No custom prompts defined]"}`}
+${agent.guidance.customPrompts.map((prompt: string) => `- ${prompt}`).join('\n') || "[No custom prompts defined]"}`}
         </pre>
       </div>
       <p class="mt-2 text-sm text-slate-500">
@@ -119,8 +118,8 @@ ${agent.guidance.customPrompts.map(prompt => `- ${prompt}`).join('\n') || "[No c
               <h4 class="font-medium text-slate-200">{tableName}</h4>
               <p class="text-sm text-slate-500">{semantics}</p>
             </div>
-            <Button 
-              color="none" 
+            <Button
+              color="gray"
               size="sm"
               onclick={() => removeTableSemantics(tableName)}
             >
@@ -141,7 +140,7 @@ ${agent.guidance.customPrompts.map(prompt => `- ${prompt}`).join('\n') || "[No c
           id="custom-prompt"
           bind:value={newPrompt}
           placeholder="Add a custom prompt for this agent"
-          rows="2"
+          rows={2}
           class="w-full bg-slate-900/50 border border-slate-700/50 rounded px-3 py-2 text-slate-200"
         />
       </div>
@@ -161,8 +160,8 @@ ${agent.guidance.customPrompts.map(prompt => `- ${prompt}`).join('\n') || "[No c
         {#each agent.guidance.customPrompts as prompt, i}
           <div class="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 flex justify-between items-center">
             <p class="text-slate-300">{prompt}</p>
-            <Button 
-              color="none" 
+            <Button
+              color="gray"
               size="sm"
               onclick={() => removeCustomPrompt(i)}
             >

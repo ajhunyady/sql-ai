@@ -145,7 +145,7 @@
               <Button color="blue" size="sm" onclick={addNewEvaluation}>
                 Create Evaluation
               </Button>
-              <Button color="none" size="sm" onclick={() => showNewEvalForm = false}>
+              <Button color="gray" size="sm" onclick={() => showNewEvalForm = false}>
                 Cancel
               </Button>
             </div>
@@ -159,8 +159,8 @@
             <div class="flex justify-between items-start mb-3">
               <h4 class="font-medium text-slate-200">{evaluation.name}</h4>
               <div class="flex space-x-2">
-                <Button 
-                  color="none" 
+                <Button
+                  color="gray"
                   size="sm"
                   onclick={() => runEvaluation(evaluation.id)}
                   disabled={evaluation.status === 'running'}
@@ -174,8 +174,8 @@
                     <PlayOutline class="w-4 h-4" />
                   {/if}
                 </Button>
-                <Button 
-                  color="none" 
+                <Button
+                  color="gray"
                   size="sm"
                   onclick={() => deleteEvaluation(evaluation.id)}
                 >

@@ -72,23 +72,27 @@
     setTimeout(() => {
       try {
         if (isNewAgent) {
-          const newAgent = createAgent({
-            name: agent.name,
-            description: agent.description,
-            datastoreIds: agent.datastoreIds,
-            guidance: agent.guidance,
-            llmProviderId: agent.llmProviderId
-          });
-          // Redirect to the new agent's page
-          goto(`/builder/agents/${newAgent.id}`);
+          if (agent) {
+            const newAgent = createAgent({
+              name: agent.name,
+              description: agent.description,
+              datastoreIds: agent.datastoreIds,
+              guidance: agent.guidance,
+              llmProviderId: agent.llmProviderId
+            });
+            // Redirect to the new agent's page
+            goto(`/builder/agents/${newAgent.id}`);
+          }
         } else {
-          updateAgent(agentId, {
-            name: agent.name,
-            description: agent.description,
-            datastoreIds: agent.datastoreIds,
-            guidance: agent.guidance,
-            llmProviderId: agent.llmProviderId
-          });
+          if (agent) {
+            updateAgent(agentId, {
+              name: agent.name,
+              description: agent.description,
+              datastoreIds: agent.datastoreIds,
+              guidance: agent.guidance,
+              llmProviderId: agent.llmProviderId
+            });
+          }
         }
       } catch (error) {
         console.error('Error saving agent:', error);
@@ -141,8 +145,8 @@
 <div class="w-full max-w-6xl mx-auto">
   <div class="flex justify-between items-center mb-8">
     <div class="flex items-center">
-      <Button 
-        color="none" 
+      <Button
+        color="gray"
         class="text-slate-400 hover:text-white p-2 mr-2"
         onclick={goBack}
       >

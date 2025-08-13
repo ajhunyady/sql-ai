@@ -15,8 +15,7 @@
       </label>
       <Input
         id="agent-name"
-        value={agent.name}
-        on:input={(e) => agent.name = e.target.value}
+        bind:value={agent.name}
         placeholder="Enter a name for your agent"
         class="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
       />
@@ -31,10 +30,9 @@
       </label>
       <Textarea
         id="agent-description"
-        value={agent.description}
-        on:input={(e) => agent.description = e.target.value}
+        bind:value={agent.description}
         placeholder="Describe what this agent does..."
-        rows="4"
+        rows={4}
         class="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
       />
       <p class="mt-2 text-sm text-slate-500">

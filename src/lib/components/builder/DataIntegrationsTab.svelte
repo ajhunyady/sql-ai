@@ -2,7 +2,7 @@
   import { Button, Badge } from 'flowbite-svelte';
   import { PlusOutline, TrashBinOutline, CheckCircleSolid } from 'flowbite-svelte-icons';
   import type { Agent } from '$lib/models/agent';
-  import type { Datastore } from '$lib/models/datastore';
+  import type { Datastore, DatastoreType } from '$lib/models/datastore';
   import { getDatastores, validateDatastore, createDatastore, updateDatastore, deleteDatastore } from '$lib/stores/datastores';
 
   let { agent = $bindable<Agent>() } = $props();
@@ -12,21 +12,21 @@
   let editingDatastoreId = $state<string | null>(null);
   let newConnection = $state({
     name: '',
-    type: 'postgres' as const,
+    type: 'postgres' as DatastoreType,
     connectionString: ''
   });
   let validationStatus = $state<Record<string, { validating: boolean; valid: boolean }>>({});
   
   function toggleDatastore(datastoreId: string) {
     if (agent.datastoreIds.includes(datastoreId)) {
-      agent.datastoreIds = agent.datastoreIds.filter(id => id !== datastoreId);
+      agent.datastoreIds = agent.datastoreIds.filter((id: string) => id !== datastoreId);
     } else {
       agent.datastoreIds = [...agent.datastoreIds, datastoreId];
     }
   }
   
   function removeDatastore(datastoreId: string) {
-    agent.datastoreIds = agent.datastoreIds.filter(id => id !== datastoreId);
+    agent.datastoreIds = agent.datastoreIds.filter((id: string) => id !== datastoreId);
   }
   
   function startEditing(datastoreId: string) {
@@ -160,7 +160,7 @@
               <Button color="blue" size="sm" onclick={saveDatastore}>
                 {editingDatastoreId ? "Update" : "Add"} Connection
               </Button>
-              <Button color="none" size="sm" onclick={resetForm}>
+              <Button color="gray" size="sm" onclick={resetForm}>
                 Cancel
               </Button>
             </div>
@@ -186,8 +186,8 @@
                 </p>
               </div>
               <div class="flex space-x-2">
-                <Button 
-                  color="none"
+                <Button
+                  color="gray"
                   size="sm"
                   onclick={() => startEditing(datastore.id)}
                 >
@@ -200,8 +200,8 @@
                 >
                   {isConnected(datastore.id) ? "Disconnect" : "Connect"}
                 </Button>
-                <Button 
-                  color="none" 
+                <Button
+                  color="gray"
                   size="sm"
                   onclick={() => validateConnection(datastore)}
                   disabled={validationStatus[datastore.id]?.validating}
@@ -214,8 +214,8 @@
                     Validate
                   {/if}
                 </Button>
-                <Button 
-                  color="none" 
+                <Button
+                  color="gray"
                   size="sm"
                   onclick={() => deleteDatastoreById(datastore.id)}
                 >
@@ -246,8 +246,8 @@
                 <h4 class="font-medium text-slate-200">{datastore.name}</h4>
                 <p class="text-sm text-slate-500">{datastore.type}</p>
               </div>
-              <Button 
-                color="none" 
+              <Button
+                color="gray"
                 size="sm"
                 onclick={() => removeDatastore(datastore.id)}
               >

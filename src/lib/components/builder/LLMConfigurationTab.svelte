@@ -2,7 +2,7 @@
   import { Button, Select } from 'flowbite-svelte';
   import { PlusOutline, CheckCircleSolid, TrashBinOutline } from 'flowbite-svelte-icons';
   import type { Agent } from '$lib/models/agent';
-  import type { LLMProvider } from '$lib/models/llm-provider';
+  import type { LLMProvider, LLMProviderType } from '$lib/models/llm-provider';
   import { getLLMProviders, validateLLMProvider, createLLMProvider, updateLLMProvider, deleteLLMProvider } from '$lib/stores/llm-providers';
 
   let { agent = $bindable<Agent>() } = $props();
@@ -12,7 +12,7 @@
   let editingProviderId = $state<string | null>(null);
   let newProvider = $state({
     name: '',
-    type: 'openai' as const,
+    type: 'openai' as LLMProviderType,
     apiKey: '',
     baseUrl: '',
     modelName: ''
@@ -79,7 +79,7 @@
     editingProviderId = null;
     newProvider = {
       name: '',
-      type: 'openai',
+      type: 'openai' as LLMProviderType,
       apiKey: '',
       baseUrl: '',
       modelName: ''
@@ -192,7 +192,7 @@
               <Button color="blue" size="sm" onclick={saveProvider}>
                 {editingProviderId ? "Update" : "Add"} Provider
               </Button>
-              <Button color="none" size="sm" onclick={resetForm}>
+              <Button color="gray" size="sm" onclick={resetForm}>
                 Cancel
               </Button>
             </div>
@@ -219,8 +219,8 @@
                 </p>
               </div>
               <div class="flex space-x-2">
-                <Button 
-                  color="none"
+                <Button
+                  color="gray"
                   size="sm"
                   onclick={() => startEditing(provider.id)}
                 >
@@ -233,8 +233,8 @@
                 >
                   {agent.llmProviderId === provider.id ? "Deselect" : "Select"}
                 </Button>
-                <Button 
-                  color="none" 
+                <Button
+                  color="gray"
                   size="sm"
                   onclick={() => validateProvider(provider)}
                   disabled={validationStatus[provider.id]?.validating}
@@ -247,8 +247,8 @@
                     Validate
                   {/if}
                 </Button>
-                <Button 
-                  color="none" 
+                <Button
+                  color="gray"
                   size="sm"
                   onclick={() => deleteProviderById(provider.id)}
                 >
@@ -274,41 +274,43 @@
       {:else}
         {#if getProviderById(agent.llmProviderId)}
           {@const selectedProvider = getProviderById(agent.llmProviderId)}
-          <div class="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
-            <div class="flex justify-between items-start mb-4">
-              <h4 class="text-lg font-medium text-slate-200">{selectedProvider.name}</h4>
-              <Button 
-                color="none" 
-                size="sm"
-                onclick={() => agent.llmProviderId = undefined}
-              >
-                Remove
-              </Button>
+          {#if selectedProvider}
+            <div class="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6">
+              <div class="flex justify-between items-start mb-4">
+                <h4 class="text-lg font-medium text-slate-200">{selectedProvider.name}</h4>
+                <Button
+                  color="gray"
+                  size="sm"
+                  onclick={() => agent.llmProviderId = undefined}
+                >
+                  Remove
+                </Button>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <p class="text-sm text-slate-500">Type</p>
+                  <p class="text-slate-300">{selectedProvider.type}</p>
+                </div>
+                <div>
+                  <p class="text-sm text-slate-500">Model</p>
+                  <p class="text-slate-300">{selectedProvider.modelName}</p>
+                </div>
+                <div>
+                  <p class="text-sm text-slate-500">Status</p>
+                  <p class="text-slate-300">
+                    <span class="inline-flex items-center">
+                      <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                      Active
+                    </span>
+                  </p>
+                </div>
+                <div>
+                  <p class="text-sm text-slate-500">Last Updated</p>
+                  <p class="text-slate-300">{selectedProvider.updatedAt.toLocaleDateString()}</p>
+                </div>
+              </div>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <p class="text-sm text-slate-500">Type</p>
-                <p class="text-slate-300">{selectedProvider.type}</p>
-              </div>
-              <div>
-                <p class="text-sm text-slate-500">Model</p>
-                <p class="text-slate-300">{selectedProvider.modelName}</p>
-              </div>
-              <div>
-                <p class="text-sm text-slate-500">Status</p>
-                <p class="text-slate-300">
-                  <span class="inline-flex items-center">
-                    <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                    Active
-                  </span>
-                </p>
-              </div>
-              <div>
-                <p class="text-sm text-slate-500">Last Updated</p>
-                <p class="text-slate-300">{selectedProvider.updatedAt.toLocaleDateString()}</p>
-              </div>
-            </div>
-          </div>
+          {/if}
         {/if}
       {/if}
       
