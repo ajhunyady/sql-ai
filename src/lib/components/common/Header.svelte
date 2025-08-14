@@ -7,12 +7,11 @@
 	import { goto } from '$app/navigation';
 
 	// Determine active section based on current route
-	$: activeSection =
-		$page.url.pathname === '/analyst'
-			? 'analyst'
-			: $page.url.pathname === '/builder'
-				? 'builder'
-				: 'analyst';
+	$: activeSection = $page.url.pathname.startsWith('/analyst')
+		? 'analyst'
+		: $page.url.pathname.startsWith('/builder')
+			? 'builder'
+			: 'analyst';
 
 	function navigateToSection(section: string) {
 		goto(`/${section}`);
@@ -26,6 +25,9 @@
 				<img src={logo} alt="Coagent Logo" class="mr-3 h-8 w-8" />
 				<span class="gradient-text">{APP_NAME}</span>
 			</div>
+			<div
+				class="hidden [&:not(:first-child)]:rounded-s-none [&:not(:last-child)]:rounded-e-none [&:not(:last-child)]:border-e-0"
+			></div>
 			<div class="hidden text-sm md:flex">
 				<ButtonGroup>
 					<Button

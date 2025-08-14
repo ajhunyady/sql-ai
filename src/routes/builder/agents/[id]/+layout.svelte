@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, Toggle } from 'flowbite-svelte';
+	import { Button } from 'flowbite-svelte';
 	import { ArrowLeftOutline, CheckCircleSolid } from 'flowbite-svelte-icons';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -7,7 +7,7 @@
 	import { updateAgentStatus } from '$lib/stores/agents';
 	import BuilderSidebar from '$lib/components/builder/BuilderSidebar.svelte';
 
-	let { data } = $props();
+	let { data, children } = $props();
 
 	// Extract agent ID from URL
 	let agentId = $derived($page.params.id || '');
@@ -116,12 +116,13 @@
 								: 'cursor-pointer'}"
 							disabled={isUpdatingStatus}
 							onclick={toggleAgentStatus}
+							aria-label={agent.isActive ? 'Deactivate agent' : 'Activate agent'}
 						>
 							<span
 								class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {agent.isActive
 									? 'translate-x-6'
 									: 'translate-x-1'}"
-							/>
+							></span>
 						</button>
 					</div>
 				{/if}
@@ -150,7 +151,7 @@
 
 					<!-- Tab Content -->
 					<div class="p-6">
-						<slot />
+						{@render children?.()}
 					</div>
 				</div>
 			{/if}

@@ -11,9 +11,10 @@
 		tabId: string;
 		nextTabId?: string;
 		onAgentUpdate?: (updates: Partial<Agent>) => void;
+		children?: import('svelte').Snippet;
 	}
 
-	let { agent, tabId, nextTabId, onAgentUpdate }: Props = $props();
+	let { agent, tabId, nextTabId, onAgentUpdate, children }: Props = $props();
 
 	let isSaving = $state(false);
 
@@ -124,8 +125,8 @@
 </script>
 
 <div class="space-y-6">
-	<!-- Tab content slot -->
-	<slot />
+	<!-- Tab content -->
+	{@render children?.()}
 
 	<!-- Action buttons -->
 	<div class="flex justify-between border-t border-slate-700/50 pt-6">
