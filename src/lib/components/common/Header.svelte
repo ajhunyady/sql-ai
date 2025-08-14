@@ -3,18 +3,16 @@
 	import {
 		CogSolid,
 		ChevronDownOutline,
-		CheeseSolid,
-		CaretLeftSolid,
 		CheckCircleSolid,
 		ExclamationCircleSolid,
-		DatabaseSolid
+		TrashBinSolid,
+		DownloadSolid
 	} from 'flowbite-svelte-icons';
 	import { onMount } from 'svelte';
 	import logo from '$lib/assets/coagent.png';
 	import { AVATAR_URL, APP_NAME } from '$lib/constants';
 	import { page } from '$app/stores';
 	import { goto, invalidateAll } from '$app/navigation';
-	import { resetAllDatabases } from '$lib/utils/database-reset';
 
 	// Determine active section based on current route
 	$: activeSection = $page.url.pathname.startsWith('/analyst')
@@ -73,16 +71,24 @@
 		}
 	}
 
-	async function resetDatabase() {
-		if (confirm('This will reset all data and reload the page. Continue?')) {
+	async function handleLoad() {
+		try {
+			await loadSampleData();
+			showToastMessage('Loading sample data...', 'success');
+		} catch (error) {
+			console.error('Failed to load sample data:', error);
+			showToastMessage('Failed to load sample data', 'error');
+		}
+	}
+
+	async function handleClear() {
+		if (confirm('This will clear all data. Continue?')) {
 			try {
-				const result = await resetAllDatabases();
-				if (!result.success) {
-					showToastMessage(`Database reset failed: ${result.error || result.message}`, 'error');
-				}
+				await clearData();
+				showToastMessage('Clearing data...', 'success');
 			} catch (error) {
-				console.error('Failed to reset database:', error);
-				showToastMessage('Failed to reset database', 'error');
+				console.error('Failed to clear data:', error);
+				showToastMessage('Failed to clear data', 'error');
 			}
 		}
 	}
@@ -138,26 +144,13 @@
 			</div>
 		</div>
 		<div class="flex items-center space-x-3">
-			<Button
-				class="icon-button rounded-lg !p-2 hover:bg-slate-800/50"
-				aria-label="Load sample data"
-				onclick={loadSampleData}
-			>
-				<CheeseSolid />
+			<Button color="blue" size="sm" class="flex items-center gap-2" onclick={handleLoad}>
+				<DownloadSolid class="h-4 w-4" />
+				Load
 			</Button>
-			<Button
-				class="icon-button rounded-lg !p-2 hover:bg-slate-800/50"
-				aria-label="Clear data"
-				onclick={clearData}
-			>
-				<CaretLeftSolid />
-			</Button>
-			<Button
-				class="icon-button rounded-lg !p-2 hover:bg-slate-800/50"
-				aria-label="Reset database"
-				onclick={resetDatabase}
-			>
-				<DatabaseSolid />
+			<Button color="red" size="sm" class="flex items-center gap-2" onclick={handleClear}>
+				<TrashBinSolid class="h-4 w-4" />
+				Clear
 			</Button>
 			<Button
 				class="icon-button rounded-lg !p-2 hover:bg-slate-800/50"

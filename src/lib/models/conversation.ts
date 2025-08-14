@@ -20,19 +20,7 @@ export interface Conversation {
 	isActive: boolean;
 }
 
-export interface ChatHistoryItem {
-	id: string;
-	title: string;
-	time: string;
-	active: boolean;
-}
-
 export interface ConversationFormData {
 	title: string;
 	messages: Message[];
-}
-
-export interface ChatHistoryFormData {
-	title: string;
-	time: string;
 }

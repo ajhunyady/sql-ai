@@ -4,12 +4,7 @@
 import type { Agent, AgentFormData } from '$lib/models/agent';
 import type { LLMProvider, LLMProviderFormData } from '$lib/models/llm-provider';
 import type { Datastore, DatastoreFormData } from '$lib/models/datastore';
-import type {
-	Conversation,
-	ConversationFormData,
-	ChatHistoryItem,
-	ChatHistoryFormData
-} from '$lib/models/conversation';
+import type { Conversation, ConversationFormData } from '$lib/models/conversation';
 
 const API_BASE = '/api';
 
@@ -144,23 +139,6 @@ export const conversationApi = {
 	delete: (id: string): Promise<{ success: boolean }> =>
 		apiRequest(`/conversations/${id}`, {
 			method: 'DELETE'
-		})
-};
-
-// Chat History API functions
-export const chatHistoryApi = {
-	getAll: (): Promise<ChatHistoryItem[]> => apiRequest('/chat-history'),
-
-	create: (data: ChatHistoryFormData): Promise<ChatHistoryItem> =>
-		apiRequest('/chat-history', {
-			method: 'POST',
-			body: JSON.stringify(data)
-		}),
-
-	setActive: (activeId: string): Promise<ChatHistoryItem[]> =>
-		apiRequest('/chat-history', {
-			method: 'PATCH',
-			body: JSON.stringify({ activeId })
 		})
 };
 

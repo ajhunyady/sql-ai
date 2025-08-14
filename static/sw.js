@@ -289,7 +289,6 @@ let agents = [];
 let llmProviders = [];
 let datastores = [];
 let conversations = [];
-let chatHistory = [];
 
 // Initialize with demo data
 function initializeDemoData() {
@@ -472,57 +471,216 @@ ORDER BY month;`
       createdAt: '2025-08-11T14:15:00.000Z',
       updatedAt: '2025-08-11T14:15:00.000Z',
       isActive: false
-    }
-  ];
-
-  chatHistory = [
-    {
-      id: 'conv-1',
-      title: 'Top 5 customers by revenue',
-      time: 'Today, 3:42 PM',
-      active: true
-    },
-    {
-      id: 'conv-2',
-      title: 'Monthly sales trend analysis',
-      time: 'Today, 2:15 PM',
-      active: false
     },
     {
       id: 'conv-3',
       title: 'Product performance metrics',
-      time: 'Yesterday, 11:30 AM',
-      active: false
+      messages: [
+        {
+          id: 'msg-6',
+          type: 'user',
+          content: 'Show me product performance metrics for our top 10 products',
+          timestamp: '2025-08-10T11:30:00.000Z'
+        },
+        {
+          id: 'msg-7',
+          type: 'ai',
+          content: 'Here are the performance metrics for your top 10 products:',
+          timestamp: '2025-08-10T11:30:00.000Z',
+          tableData: [
+            { product: 'Product A', units: '2,450', revenue: '$245,000', margin: '32%' },
+            { product: 'Product B', units: '1,890', revenue: '$189,000', margin: '28%' },
+            { product: 'Product C', units: '1,560', revenue: '$156,000', margin: '35%' }
+          ],
+          sqlQuery: `SELECT p.name AS product,
+       SUM(s.quantity) AS units,
+       SUM(s.amount) AS revenue,
+       AVG(p.profit_margin) AS margin
+FROM sales s
+JOIN products p ON s.product_id = p.id
+GROUP BY p.name
+ORDER BY revenue DESC
+LIMIT 10;`
+        }
+      ],
+      createdAt: '2025-08-10T11:30:00.000Z',
+      updatedAt: '2025-08-10T11:30:00.000Z',
+      isActive: false
     },
     {
       id: 'conv-4',
       title: 'Regional sales comparison',
-      time: 'Aug 10, 2025',
-      active: false
+      messages: [
+        {
+          id: 'msg-8',
+          type: 'user',
+          content: 'Compare sales performance across different regions',
+          timestamp: '2025-08-10T09:15:00.000Z'
+        },
+        {
+          id: 'msg-9',
+          type: 'ai',
+          content: 'Here is the regional sales comparison:',
+          timestamp: '2025-08-10T09:15:00.000Z',
+          tableData: [
+            { region: 'North America', sales: '$3,450,000', growth: '+12.5%' },
+            { region: 'Europe', sales: '$2,890,000', growth: '+8.3%' },
+            { region: 'Asia Pacific', sales: '$2,120,000', growth: '+15.7%' },
+            { region: 'Latin America', sales: '$980,000', growth: '+5.2%' }
+          ],
+          sqlQuery: `SELECT r.name AS region,
+       SUM(s.amount) AS sales,
+       ROUND(((SUM(s.amount) - SUM(s.prev_year_amount)) / SUM(s.prev_year_amount)) * 100, 1) AS growth
+FROM sales s
+JOIN regions r ON s.region_id = r.id
+GROUP BY r.name
+ORDER BY sales DESC;`
+        }
+      ],
+      createdAt: '2025-08-10T09:15:00.000Z',
+      updatedAt: '2025-08-10T09:15:00.000Z',
+      isActive: false
     },
     {
       id: 'conv-5',
       title: 'Customer retention analysis',
-      time: 'Aug 10, 2025',
-      active: false
+      messages: [
+        {
+          id: 'msg-10',
+          type: 'user',
+          content: 'Analyze customer retention rates and identify at-risk customers',
+          timestamp: '2025-08-10T08:45:00.000Z'
+        },
+        {
+          id: 'msg-11',
+          type: 'ai',
+          content: 'Here is the customer retention analysis:',
+          timestamp: '2025-08-10T08:45:00.000Z',
+          tableData: [
+            { segment: 'Enterprise', retention: '94.2%', atRisk: '12' },
+            { segment: 'Mid-Market', retention: '87.5%', atRisk: '28' },
+            { segment: 'Small Business', retention: '78.3%', atRisk: '45' },
+            { segment: 'Startup', retention: '65.1%', atRisk: '67' }
+          ],
+          sqlQuery: `SELECT c.segment,
+       ROUND((COUNT(CASE WHEN c.status = 'active' THEN 1 END) / COUNT(*)) * 100, 1) AS retention,
+       COUNT(CASE WHEN c.risk_score > 0.7 THEN 1 END) AS at_risk
+FROM customers c
+GROUP BY c.segment
+ORDER BY retention DESC;`
+        }
+      ],
+      createdAt: '2025-08-10T08:45:00.000Z',
+      updatedAt: '2025-08-10T08:45:00.000Z',
+      isActive: false
     },
     {
       id: 'conv-6',
       title: 'Quarterly revenue breakdown',
-      time: 'Aug 9, 2025',
-      active: false
+      messages: [
+        {
+          id: 'msg-12',
+          type: 'user',
+          content: 'Break down quarterly revenue by business unit',
+          timestamp: '2025-08-09T16:20:00.000Z'
+        },
+        {
+          id: 'msg-13',
+          type: 'ai',
+          content: 'Here is the quarterly revenue breakdown by business unit:',
+          timestamp: '2025-08-09T16:20:00.000Z',
+          tableData: [
+            { unit: 'Software', q1: '$1,240,000', q2: '$1,380,000', growth: '+11.3%' },
+            { unit: 'Services', q1: '$890,000', q2: '$920,000', growth: '+3.4%' },
+            { unit: 'Hardware', q1: '$560,000', q2: '$480,000', growth: '-14.3%' },
+            { unit: 'Consulting', q1: '$320,000', q2: '$410,000', growth: '+28.1%' }
+          ],
+          sqlQuery: `SELECT bu.name AS unit,
+       SUM(CASE WHEN QUARTER(s.date) = 1 THEN s.amount ELSE 0 END) AS q1,
+       SUM(CASE WHEN QUARTER(s.date) = 2 THEN s.amount ELSE 0 END) AS q2,
+       ROUND(((SUM(CASE WHEN QUARTER(s.date) = 2 THEN s.amount ELSE 0 END) - SUM(CASE WHEN QUARTER(s.date) = 1 THEN s.amount ELSE 0 END)) / SUM(CASE WHEN QUARTER(s.date) = 1 THEN s.amount ELSE 0 END)) * 100, 1) AS growth
+FROM sales s
+JOIN business_units bu ON s.business_unit_id = bu.id
+GROUP BY bu.name;`
+        }
+      ],
+      createdAt: '2025-08-09T16:20:00.000Z',
+      updatedAt: '2025-08-09T16:20:00.000Z',
+      isActive: false
     },
     {
       id: 'conv-7',
       title: 'Market share insights',
-      time: 'Aug 8, 2025',
-      active: false
+      messages: [
+        {
+          id: 'msg-14',
+          type: 'user',
+          content: 'Show me our market share compared to competitors',
+          timestamp: '2025-08-08T14:30:00.000Z'
+        },
+        {
+          id: 'msg-15',
+          type: 'ai',
+          content: 'Here are the market share insights:',
+          timestamp: '2025-08-08T14:30:00.000Z',
+          tableData: [
+            { company: 'Our Company', share: '23.5%', change: '+2.1%' },
+            { company: 'Competitor A', share: '31.2%', change: '-1.4%' },
+            { company: 'Competitor B', share: '18.7%', change: '+0.8%' },
+            { company: 'Competitor C', share: '15.3%', change: '-0.3%' },
+            { company: 'Others', share: '11.3%', change: '-1.2%' }
+          ],
+          sqlQuery: `SELECT company_name AS company,
+       ROUND((revenue / total_market_revenue) * 100, 1) AS share,
+       ROUND(((current_share - previous_share) / previous_share) * 100, 1) AS change
+FROM market_analysis
+ORDER BY share DESC;`
+        }
+      ],
+      createdAt: '2025-08-08T14:30:00.000Z',
+      updatedAt: '2025-08-08T14:30:00.000Z',
+      isActive: false
     },
     {
       id: 'conv-8',
       title: 'Inventory turnover rates',
-      time: 'Aug 7, 2025',
-      active: false
+      messages: [
+        {
+          id: 'msg-16',
+          type: 'user',
+          content: 'Calculate inventory turnover rates for all product categories',
+          timestamp: '2025-08-07T10:15:00.000Z'
+        },
+        {
+          id: 'msg-17',
+          type: 'ai',
+          content: 'Here are the inventory turnover rates by product category:',
+          timestamp: '2025-08-07T10:15:00.000Z',
+          tableData: [
+            { category: 'Electronics', turnover: '8.2x', days: '45', status: 'Good' },
+            { category: 'Clothing', turnover: '12.1x', days: '30', status: 'Excellent' },
+            { category: 'Home & Garden', turnover: '4.3x', days: '85', status: 'Poor' },
+            { category: 'Sports', turnover: '6.7x', days: '54', status: 'Fair' }
+          ],
+          sqlQuery: `SELECT pc.name AS category,
+       ROUND(SUM(s.quantity * s.unit_cost) / AVG(i.value), 1) AS turnover,
+       ROUND(365 / (SUM(s.quantity * s.unit_cost) / AVG(i.value)), 0) AS days,
+       CASE
+         WHEN (SUM(s.quantity * s.unit_cost) / AVG(i.value)) > 10 THEN 'Excellent'
+         WHEN (SUM(s.quantity * s.unit_cost) / AVG(i.value)) > 6 THEN 'Good'
+         WHEN (SUM(s.quantity * s.unit_cost) / AVG(i.value)) > 4 THEN 'Fair'
+         ELSE 'Poor'
+       END AS status
+FROM sales s
+JOIN products p ON s.product_id = p.id
+JOIN product_categories pc ON p.category_id = pc.id
+JOIN inventory i ON p.id = i.product_id
+GROUP BY pc.name;`
+        }
+      ],
+      createdAt: '2025-08-07T10:15:00.000Z',
+      updatedAt: '2025-08-07T10:15:00.000Z',
+      isActive: false
     }
   ];
 
@@ -539,7 +697,6 @@ async function loadData() {
     const storedProviders = await dbManager.getAll('llmProviders');
     const storedDatastores = await dbManager.getAll('datastores');
     const storedConversations = await dbManager.getAll('conversations');
-    const storedChatHistory = await dbManager.getAll('chatHistory');
 
     if (storedAgents.length > 0) {
       agents = storedAgents;
@@ -572,14 +729,6 @@ async function loadData() {
       initializeDemoData();
       await saveData();
     }
-
-    if (storedChatHistory.length > 0) {
-      chatHistory = storedChatHistory;
-      logger.info(`Loaded ${chatHistory.length} chat history items from IndexedDB`);
-    } else {
-      initializeDemoData();
-      await saveData();
-    }
   } catch (error) {
     logger.error('Failed to load data from IndexedDB, using demo data', error);
     initializeDemoData();
@@ -596,7 +745,7 @@ async function saveData() {
     await dbManager.clearStore('llmProviders');
     await dbManager.clearStore('datastores');
     await dbManager.clearStore('conversations');
-    await dbManager.clearStore('chatHistory');
+
 
     // Save current data with error handling
     for (const agent of agents) {
@@ -631,13 +780,7 @@ async function saveData() {
       }
     }
 
-    for (const item of chatHistory) {
-      try {
-        await dbManager.create('chatHistory', item);
-      } catch (error) {
-        logger.warn('Failed to save chat history item', { id: item.id, error: error.message });
-      }
-    }
+
 
     logger.info('Data saved to IndexedDB successfully');
   } catch (error) {
@@ -1207,73 +1350,7 @@ async function handleConversations(request, url) {
 }
 
 // Handle chat history
-async function handleChatHistory(request, url) {
-  const requestId = generateRequestId();
-  const method = request.method;
 
-  try {
-    interceptRequest(request, requestId);
-
-    switch (method) {
-      case 'GET':
-        const listResponse = createResponse(chatHistory);
-        interceptResponse(listResponse, requestId);
-        return listResponse;
-
-      case 'POST':
-        const postData = await request.json().catch(error => {
-          throw new Error('Invalid JSON in request body');
-        });
-
-        const newChatItem = {
-          id: generateId(),
-          ...postData,
-          active: false
-        };
-
-        chatHistory.push(newChatItem);
-        await saveData();
-
-        logger.info('Created new chat history item', { id: newChatItem.id, title: newChatItem.title }, requestId);
-        const createdResponse = createResponse(newChatItem, 201);
-        interceptResponse(createdResponse, requestId);
-        return createdResponse;
-
-      case 'PATCH':
-        const patchData = await request.json().catch(error => {
-          throw new Error('Invalid JSON in request body');
-        });
-
-        // Set all items to inactive
-        chatHistory.forEach(item => item.active = false);
-
-        // Set the specified item to active
-        if (patchData.activeId) {
-          const activeItem = chatHistory.find(item => item.id === patchData.activeId);
-          if (activeItem) {
-            activeItem.active = true;
-          }
-        }
-
-        await saveData();
-
-        logger.info('Updated chat history active state', { activeId: patchData.activeId }, requestId);
-        const patchResponse = createResponse(chatHistory);
-        interceptResponse(patchResponse, requestId);
-        return patchResponse;
-
-      default:
-        const methodNotAllowedResponse = createErrorResponse('Method not allowed', 405, requestId);
-        interceptResponse(methodNotAllowedResponse, requestId);
-        return methodNotAllowedResponse;
-    }
-  } catch (error) {
-    logger.error('Error handling chat history request', error, requestId);
-    const response = createErrorResponse(`Internal server error: ${error.message}`, 500, requestId);
-    interceptResponse(response, requestId);
-    return response;
-  }
-}
 
 // Handle validation endpoints
 async function handleValidation(request, url) {
@@ -1362,7 +1439,6 @@ async function handleManagement(request, url) {
         llmProviders = [];
         datastores = [];
         conversations = [];
-        chatHistory = [];
         initializeDemoData();
         await saveData();
 
@@ -1381,7 +1457,6 @@ async function handleManagement(request, url) {
           llmProviders = [];
           datastores = [];
           conversations = [];
-          chatHistory = [];
           initializeDemoData();
           await saveData();
 
@@ -1479,7 +1554,6 @@ self.addEventListener('message', async event => {
           llmProviders = [];
           datastores = [];
           conversations = [];
-          chatHistory = [];
           initializeDemoData();
           await saveData();
 
@@ -1564,8 +1638,7 @@ self.addEventListener('fetch', event => {
     event.respondWith(handleDatastores(request, url));
   } else if (url.pathname.startsWith('/api/conversations')) {
     event.respondWith(handleConversations(request, url));
-  } else if (url.pathname.startsWith('/api/chat-history')) {
-    event.respondWith(handleChatHistory(request, url));
+
   } else if (url.pathname.startsWith('/api/validate')) {
     event.respondWith(handleValidation(request, url));
   } else if (url.pathname.startsWith('/api/management')) {

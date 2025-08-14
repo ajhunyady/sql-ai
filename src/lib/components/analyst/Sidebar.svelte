@@ -1,33 +1,60 @@
 <script lang="ts">
 	import { Input, Button } from 'flowbite-svelte';
 	import { PlusOutline, SearchSolid, ClockSolid } from 'flowbite-svelte-icons';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import ChatHistoryItem from './ChatHistoryItem.svelte';
+
 	import {
-		chatHistory,
-		chatHistoryLoading,
-		chatHistoryError,
-		loadChatHistory,
-		setActiveChatHistoryItem
-	} from '$lib/stores/chatHistory';
+		conversations,
+		conversationsLoading,
+		conversationsError,
+		loadConversations,
+		setActiveConversation
+	} from '$lib/stores/conversations';
 	import { onMount } from 'svelte';
 
 	let searchTerm = $state('');
 
-	// Reactive filtered chat history
-	let filteredChatHistory = $derived(
-		$chatHistory.filter((item) => item.title.toLowerCase().includes(searchTerm.toLowerCase()))
+	// Reactive filtered conversations converted to chat history format
+	let filteredConversations = $derived(
+		$conversations
+			.filter((conv) => conv.title.toLowerCase().includes(searchTerm.toLowerCase()))
+			.map((conv) => ({
+				id: conv.id,
+				title: conv.title,
+				time: new Date(conv.updatedAt).toLocaleTimeString('en-US', {
+					hour: 'numeric',
+					minute: '2-digit'
+				}),
+				active: false
+			}))
+			.sort(
+				(a, b) =>
+					new Date($conversations.find((c) => c.id === b.id)?.updatedAt || 0).getTime() -
+					new Date($conversations.find((c) => c.id === a.id)?.updatedAt || 0).getTime()
+			)
 	);
 
 	onMount(() => {
-		// Load chat history if not already loaded
-		if ($chatHistory.length === 0 && !$chatHistoryLoading) {
-			loadChatHistory();
+		// Load conversations if not already loaded
+		if ($conversations.length === 0 && !$conversationsLoading) {
+			loadConversations();
 		}
 	});
 
 	async function handleChatItemClick(id: string) {
-		await setActiveChatHistoryItem(id);
+		await goto(`/analyst/${id}`);
 	}
+
+	async function handleNewConversation() {
+		// Clear active conversation and navigate to main analyst page
+		setActiveConversation(null);
+		await goto('/analyst');
+	}
+
+	// Check if we're on a conversation page to highlight the active item
+	let currentConversationId = $derived($page.params?.conversationId);
 </script>
 
 <div
@@ -43,7 +70,7 @@
 					type="text"
 					placeholder="Search conversations..."
 					class="w-full rounded-xl border border-blue-500/30 bg-slate-900/50 px-4 py-3 pr-10 text-sm text-slate-200 transition-all duration-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-					disabled={$chatHistoryLoading}
+					disabled={$conversationsLoading}
 				/>
 				<SearchSolid class="absolute top-3.5 right-4 h-4 w-4 text-sm text-blue-400" />
 			</div>
@@ -52,8 +79,9 @@
 		<!-- New Chat Button -->
 		<Button
 			color="blue"
-			class="button-hover mb-8 flex w-full items-center justify-center px-4 py-3 text-sm font-medium"
+			class="button-hover mb-6 flex w-full items-center justify-center px-4 py-3 text-sm font-medium"
 			aria-label="Start a new conversation"
+			onclick={handleNewConversation}
 		>
 			<PlusOutline class="mr-2" />
 			New Conversation
@@ -67,7 +95,7 @@
 			</h3>
 		</div>
 		<div class="max-h-96 space-y-2 overflow-y-auto" role="list" aria-label="Recent conversations">
-			{#if $chatHistoryLoading}
+			{#if $conversationsLoading}
 				<div class="flex items-center justify-center py-4">
 					<div class="text-center">
 						<div
@@ -76,28 +104,28 @@
 						<p class="text-xs text-slate-400">Loading conversations...</p>
 					</div>
 				</div>
-			{:else if $chatHistoryError}
+			{:else if $conversationsError}
 				<div class="p-3 text-center">
-					<p class="mb-2 text-xs text-red-400">{$chatHistoryError}</p>
+					<p class="mb-2 text-xs text-red-400">{$conversationsError}</p>
 					<button
-						onclick={() => loadChatHistory()}
+						onclick={() => loadConversations()}
 						class="text-xs text-blue-400 hover:text-blue-300"
 					>
 						Retry
 					</button>
 				</div>
-			{:else if filteredChatHistory.length === 0}
+			{:else if filteredConversations.length === 0}
 				<div class="p-3 text-center">
 					<p class="text-xs text-slate-400">
 						{searchTerm ? 'No conversations match your search' : 'No conversations yet'}
 					</p>
 				</div>
 			{:else}
-				{#each filteredChatHistory as item (item.id)}
+				{#each filteredConversations as item (item.id)}
 					<ChatHistoryItem
 						title={item.title}
 						time={item.time}
-						active={item.active}
+						active={item.id === currentConversationId}
 						onclick={() => handleChatItemClick(item.id)}
 					/>
 				{/each}

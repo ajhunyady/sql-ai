@@ -11,5 +11,4 @@ export * from './builder';
 export * from './common';
 
 // Direct exports for convenience
-export { default as AnalystSection } from './analyst/AnalystSection.svelte';
 export { default as Header } from './common/Header.svelte';
