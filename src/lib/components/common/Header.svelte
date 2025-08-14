@@ -6,13 +6,15 @@
 		CheeseSolid,
 		CaretLeftSolid,
 		CheckCircleSolid,
-		ExclamationCircleSolid
+		ExclamationCircleSolid,
+		DatabaseSolid
 	} from 'flowbite-svelte-icons';
 	import { onMount } from 'svelte';
 	import logo from '$lib/assets/coagent.png';
 	import { AVATAR_URL, APP_NAME } from '$lib/constants';
 	import { page } from '$app/stores';
 	import { goto, invalidateAll } from '$app/navigation';
+	import { resetAllDatabases } from '$lib/utils/database-reset';
 
 	// Determine active section based on current route
 	$: activeSection = $page.url.pathname.startsWith('/analyst')
@@ -68,6 +70,20 @@
 		} catch (error) {
 			console.error('Failed to clear data:', error);
 			showToastMessage('Failed to clear data', 'error');
+		}
+	}
+
+	async function resetDatabase() {
+		if (confirm('This will reset all data and reload the page. Continue?')) {
+			try {
+				const result = await resetAllDatabases();
+				if (!result.success) {
+					showToastMessage(`Database reset failed: ${result.error || result.message}`, 'error');
+				}
+			} catch (error) {
+				console.error('Failed to reset database:', error);
+				showToastMessage('Failed to reset database', 'error');
+			}
 		}
 	}
 
@@ -135,6 +151,13 @@
 				onclick={clearData}
 			>
 				<CaretLeftSolid />
+			</Button>
+			<Button
+				class="icon-button rounded-lg !p-2 hover:bg-slate-800/50"
+				aria-label="Reset database"
+				onclick={resetDatabase}
+			>
+				<DatabaseSolid />
 			</Button>
 			<Button
 				class="icon-button rounded-lg !p-2 hover:bg-slate-800/50"

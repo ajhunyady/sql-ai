@@ -5,7 +5,7 @@
 const CACHE_NAME = 'coagent-sql-v2';
 const API_BASE = '/api';
 const DB_NAME = 'CoAgentDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 // Enhanced logging system
 class Logger {
@@ -69,43 +69,7 @@ class Logger {
   }
 }
 
-// Performance monitoring
-class PerformanceMonitor {
-  constructor() {
-    this.metrics = {
-      requestCount: 0,
-      responseTime: 0,
-      errorCount: 0,
-      lastUpdated: new Date().toISOString()
-    };
-    this.requestTimes = new Map();
-  }
 
-  startRequest(requestId) {
-    this.requestTimes.set(requestId, Date.now());
-    this.metrics.requestCount++;
-  }
-
-  endRequest(requestId) {
-    const startTime = this.requestTimes.get(requestId);
-    if (startTime) {
-      const duration = Date.now() - startTime;
-      this.metrics.responseTime = (this.metrics.responseTime + duration) / 2;
-      this.requestTimes.delete(requestId);
-    }
-  }
-
-  recordError() {
-    this.metrics.errorCount++;
-  }
-
-  getMetrics() {
-    return {
-      ...this.metrics,
-      lastUpdated: new Date().toISOString()
-    };
-  }
-}
 
 // IndexedDB Database Manager
 class DatabaseManager {
@@ -178,6 +142,10 @@ class DatabaseManager {
 
   async getAll(storeName) {
     await this.init();
+    if (!this.db.objectStoreNames.contains(storeName)) {
+      logger.warn(`Store ${storeName} does not exist, returning empty array`);
+      return [];
+    }
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction([storeName], 'readonly');
       const store = transaction.objectStore(storeName);
@@ -190,6 +158,10 @@ class DatabaseManager {
 
   async getById(storeName, id) {
     await this.init();
+    if (!this.db.objectStoreNames.contains(storeName)) {
+      logger.warn(`Store ${storeName} does not exist, returning null`);
+      return null;
+    }
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction([storeName], 'readonly');
       const store = transaction.objectStore(storeName);
@@ -202,6 +174,10 @@ class DatabaseManager {
 
   async create(storeName, data) {
     await this.init();
+    if (!this.db.objectStoreNames.contains(storeName)) {
+      logger.error(`Store ${storeName} does not exist, cannot create data`);
+      throw new Error(`Store ${storeName} not found`);
+    }
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction([storeName], 'readwrite');
       const store = transaction.objectStore(storeName);
@@ -214,6 +190,10 @@ class DatabaseManager {
 
   async update(storeName, id, data) {
     await this.init();
+    if (!this.db.objectStoreNames.contains(storeName)) {
+      logger.error(`Store ${storeName} does not exist, cannot update data`);
+      throw new Error(`Store ${storeName} not found`);
+    }
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction([storeName], 'readwrite');
       const store = transaction.objectStore(storeName);
@@ -226,6 +206,10 @@ class DatabaseManager {
 
   async delete(storeName, id) {
     await this.init();
+    if (!this.db.objectStoreNames.contains(storeName)) {
+      logger.warn(`Store ${storeName} does not exist, delete operation skipped`);
+      return;
+    }
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction([storeName], 'readwrite');
       const store = transaction.objectStore(storeName);
@@ -238,6 +222,10 @@ class DatabaseManager {
 
   async clearStore(storeName) {
     await this.init();
+    if (!this.db.objectStoreNames.contains(storeName)) {
+      logger.warn(`Store ${storeName} does not exist, clear operation skipped`);
+      return;
+    }
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction([storeName], 'readwrite');
       const store = transaction.objectStore(storeName);
@@ -250,16 +238,50 @@ class DatabaseManager {
 
   async clearAll() {
     await this.init();
-    const stores = ['agents', 'llmProviders', 'datastores'];
+    const stores = ['agents', 'llmProviders', 'datastores', 'conversations', 'chatHistory'];
     for (const storeName of stores) {
       await this.clearStore(storeName);
+    }
+  }
+
+  async resetDatabase() {
+    try {
+      if (this.db) {
+        this.db.close();
+      }
+
+      // Delete the database
+      await new Promise((resolve, reject) => {
+        const deleteRequest = indexedDB.deleteDatabase(DB_NAME);
+        deleteRequest.onsuccess = () => {
+          logger.info('Database deleted successfully');
+          resolve();
+        };
+        deleteRequest.onerror = () => {
+          logger.error('Failed to delete database', deleteRequest.error);
+          reject(deleteRequest.error);
+        };
+        deleteRequest.onblocked = () => {
+          logger.warn('Database deletion blocked');
+        };
+      });
+
+      // Reset state
+      this.db = null;
+      this.initialized = false;
+
+      // Reinitialize
+      await this.init();
+      logger.info('Database reset and reinitialized successfully');
+    } catch (error) {
+      logger.error('Failed to reset database', error);
+      throw error;
     }
   }
 }
 
 // Initialize services
 const logger = new Logger();
-const performanceMonitor = new PerformanceMonitor();
 const dbManager = new DatabaseManager();
 
 // In-memory data stores (fallback and initial data)
@@ -576,30 +598,63 @@ async function saveData() {
     await dbManager.clearStore('conversations');
     await dbManager.clearStore('chatHistory');
 
-    // Save current data
+    // Save current data with error handling
     for (const agent of agents) {
-      await dbManager.create('agents', agent);
+      try {
+        await dbManager.create('agents', agent);
+      } catch (error) {
+        logger.warn('Failed to save agent', { id: agent.id, error: error.message });
+      }
     }
 
     for (const provider of llmProviders) {
-      await dbManager.create('llmProviders', provider);
+      try {
+        await dbManager.create('llmProviders', provider);
+      } catch (error) {
+        logger.warn('Failed to save LLM provider', { id: provider.id, error: error.message });
+      }
     }
 
     for (const datastore of datastores) {
-      await dbManager.create('datastores', datastore);
+      try {
+        await dbManager.create('datastores', datastore);
+      } catch (error) {
+        logger.warn('Failed to save datastore', { id: datastore.id, error: error.message });
+      }
     }
 
     for (const conversation of conversations) {
-      await dbManager.create('conversations', conversation);
+      try {
+        await dbManager.create('conversations', conversation);
+      } catch (error) {
+        logger.warn('Failed to save conversation', { id: conversation.id, error: error.message });
+      }
     }
 
-    for (const chat of chatHistory) {
-      await dbManager.create('chatHistory', chat);
+    for (const item of chatHistory) {
+      try {
+        await dbManager.create('chatHistory', item);
+      } catch (error) {
+        logger.warn('Failed to save chat history item', { id: item.id, error: error.message });
+      }
     }
 
-    logger.info('Data saved to IndexedDB');
+    logger.info('Data saved to IndexedDB successfully');
   } catch (error) {
     logger.error('Failed to save data to IndexedDB', error);
+
+    // If saving fails due to database issues, try to reset and reinitialize
+    if (error.message.includes('not found') || error.name === 'NotFoundError') {
+      logger.info('Attempting database reset due to schema issues');
+      try {
+        await dbManager.resetDatabase();
+        // Try to save again after reset
+        initializeDemoData();
+        await saveData();
+      } catch (resetError) {
+        logger.error('Failed to reset database', resetError);
+      }
+    }
   }
 }
 
@@ -626,7 +681,6 @@ function createResponse(data, status = 200) {
 
 function createErrorResponse(message, status = 400, requestId = null) {
   logger.error(`API Error: ${message}`, null, requestId);
-  performanceMonitor.recordError();
   return createResponse({ error: message }, status);
 }
 
@@ -637,14 +691,10 @@ function interceptRequest(request, requestId) {
     url: request.url,
     headers: Object.fromEntries(request.headers.entries())
   }, requestId);
-
-  performanceMonitor.startRequest(requestId);
 }
 
 // Response interceptor for logging
 function interceptResponse(response, requestId) {
-  performanceMonitor.endRequest(requestId);
-
   logger.debug(`Response for request ${requestId}`, {
     status: response.status,
     statusText: response.statusText
@@ -1273,7 +1323,7 @@ async function handleManagement(request, url) {
             used: performance.memory ? performance.memory.usedJSHeapSize : 0,
             total: performance.memory ? performance.memory.totalJSHeapSize : 0
           },
-          activeRequests: Array.from(performanceMonitor.requestTimes.keys()),
+          activeRequests: [],
           lastErrors: logger.getRecentLogs(10).filter(log => log.level === 'error')
         };
         const debugResponse = createResponse(debugInfo);
@@ -1281,7 +1331,12 @@ async function handleManagement(request, url) {
         return debugResponse;
 
       case 'performance-metrics':
-        const metrics = performanceMonitor.getMetrics();
+        const metrics = {
+          requestCount: 0,
+          responseTime: 0,
+          errorCount: 0,
+          lastUpdated: new Date().toISOString()
+        };
         const metricsResponse = createResponse(metrics);
         interceptResponse(metricsResponse, requestId);
         return metricsResponse;
@@ -1311,19 +1366,35 @@ async function handleManagement(request, url) {
         initializeDemoData();
         await saveData();
 
-        // Clear logs and reset metrics
+        // Clear logs
         logger.logs = [];
-        performanceMonitor.metrics = {
-          requestCount: 0,
-          responseTime: 0,
-          errorCount: 0,
-          lastUpdated: new Date().toISOString()
-        };
 
         logger.info('Service worker reset to initial state', null, requestId);
         const resetResponse = createResponse({ success: true });
         interceptResponse(resetResponse, requestId);
         return resetResponse;
+
+      case 'reset-database':
+        try {
+          await dbManager.resetDatabase();
+          agents = [];
+          llmProviders = [];
+          datastores = [];
+          conversations = [];
+          chatHistory = [];
+          initializeDemoData();
+          await saveData();
+
+          logger.info('Database reset completed successfully', null, requestId);
+          const dbResetResponse = createResponse({ success: true, message: 'Database reset successfully' });
+          interceptResponse(dbResetResponse, requestId);
+          return dbResetResponse;
+        } catch (error) {
+          logger.error('Failed to reset database', error, requestId);
+          const errorResponse = createErrorResponse(`Database reset failed: ${error.message}`, 500, requestId);
+          interceptResponse(errorResponse, requestId);
+          return errorResponse;
+        }
 
       default:
         const response = createErrorResponse('Management action not found', 404, requestId);
@@ -1361,16 +1432,18 @@ self.addEventListener('message', async event => {
         break;
 
       case 'get-performance-metrics':
-        handleManagement(new Request('/api/management/performance-metrics'), new URL('http://localhost/api/management/performance-metrics'))
-          .then(response => response.json())
-          .then(data => {
-            event.source.postMessage({
-              type: 'performance-metrics',
-              success: true,
-              data,
-              timestamp: Date.now()
-            });
-          });
+        const metrics = {
+          requestCount: 0,
+          responseTime: 0,
+          errorCount: 0,
+          lastUpdated: new Date().toISOString()
+        };
+        event.source.postMessage({
+          type: 'performance-metrics',
+          success: true,
+          data: metrics,
+          timestamp: Date.now()
+        });
         break;
 
       case 'clear-data':
@@ -1496,6 +1569,8 @@ self.addEventListener('fetch', event => {
   } else if (url.pathname.startsWith('/api/validate')) {
     event.respondWith(handleValidation(request, url));
   } else if (url.pathname.startsWith('/api/management')) {
+    event.respondWith(handleManagement(request, url));
+  } else if (url.pathname.startsWith('/api/management/reset-database')) {
     event.respondWith(handleManagement(request, url));
   } else {
     event.respondWith(createErrorResponse('Endpoint not found', 404));
