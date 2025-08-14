@@ -158,6 +158,20 @@ class DatabaseManager {
           datastoreStore.createIndex('isActive', 'isActive', { unique: false });
           datastoreStore.createIndex('type', 'type', { unique: false });
         }
+
+        if (!db.objectStoreNames.contains('conversations')) {
+          const conversationStore = db.createObjectStore('conversations', { keyPath: 'id' });
+          conversationStore.createIndex('createdAt', 'createdAt', { unique: false });
+          conversationStore.createIndex('updatedAt', 'updatedAt', { unique: false });
+          conversationStore.createIndex('isActive', 'isActive', { unique: false });
+          conversationStore.createIndex('title', 'title', { unique: false });
+        }
+
+        if (!db.objectStoreNames.contains('chatHistory')) {
+          const chatHistoryStore = db.createObjectStore('chatHistory', { keyPath: 'id' });
+          chatHistoryStore.createIndex('active', 'active', { unique: false });
+          chatHistoryStore.createIndex('title', 'title', { unique: false });
+        }
       };
     });
   }
@@ -252,6 +266,8 @@ const dbManager = new DatabaseManager();
 let agents = [];
 let llmProviders = [];
 let datastores = [];
+let conversations = [];
+let chatHistory = [];
 
 // Initialize with demo data
 function initializeDemoData() {
@@ -354,6 +370,140 @@ function initializeDemoData() {
     }
   ];
 
+  conversations = [
+    {
+      id: 'conv-1',
+      title: 'Top 5 customers by revenue',
+      messages: [
+        {
+          id: 'msg-1',
+          type: 'user',
+          content: 'Show me the top 5 customers by revenue for Q1 2025',
+          timestamp: '2025-08-11T15:42:00.000Z'
+        },
+        {
+          id: 'msg-2',
+          type: 'ai',
+          content: 'Here are the top 5 customers by revenue for Q1 2025:',
+          timestamp: '2025-08-11T15:42:00.000Z',
+          tableData: [
+            { customer: 'Acme Corporation', revenue: '$1,245,000', yoyChange: '+12.3%' },
+            { customer: 'TechNova Inc.', revenue: '$982,500', yoyChange: '+8.7%' },
+            { customer: 'Global Systems', revenue: '$875,320', yoyChange: '-2.1%' },
+            { customer: 'Nexus Partners', revenue: '$743,900', yoyChange: '+15.8%' },
+            { customer: 'Quantum Enterprises', revenue: '$698,450', yoyChange: '+5.3%' }
+          ],
+          sqlQuery: `SELECT c.customer_name AS Customer,
+       SUM(s.amount) AS Revenue,
+       (SUM(s.amount) - LAG_REVENUE) / LAG_REVENUE * 100 AS YoY_Change
+FROM sales s
+JOIN customers c ON s.customer_id = c.id
+WHERE s.date BETWEEN '2025-01-01' AND '2025-03-31'
+GROUP BY c.customer_name
+ORDER BY Revenue DESC
+LIMIT 5;`
+        },
+        {
+          id: 'msg-3',
+          type: 'user',
+          content: 'Show this as a bar chart',
+          timestamp: '2025-08-11T15:43:00.000Z'
+        }
+      ],
+      createdAt: '2025-08-11T15:42:00.000Z',
+      updatedAt: '2025-08-11T15:43:00.000Z',
+      isActive: true
+    },
+    {
+      id: 'conv-2',
+      title: 'Monthly sales trend analysis',
+      messages: [
+        {
+          id: 'msg-4',
+          type: 'user',
+          content: 'Analyze monthly sales trends for the past 6 months',
+          timestamp: '2025-08-11T14:15:00.000Z'
+        },
+        {
+          id: 'msg-5',
+          type: 'ai',
+          content: 'Here is the monthly sales trend analysis for the past 6 months:',
+          timestamp: '2025-08-11T14:15:00.000Z',
+          tableData: [
+            { month: 'February 2025', sales: '$2,150,000', change: '+8.5%' },
+            { month: 'March 2025', sales: '$2,340,000', change: '+8.8%' },
+            { month: 'April 2025', sales: '$2,180,000', change: '-6.8%' },
+            { month: 'May 2025', sales: '$2,520,000', change: '+15.6%' },
+            { month: 'June 2025', sales: '$2,680,000', change: '+6.3%' },
+            { month: 'July 2025', sales: '$2,430,000', change: '-9.3%' }
+          ],
+          sqlQuery: `SELECT DATE_TRUNC('month', s.date) AS month,
+       SUM(s.amount) AS sales,
+       LAG(SUM(s.amount)) OVER (ORDER BY DATE_TRUNC('month', s.date)) AS prev_month,
+       ROUND(((SUM(s.amount) - LAG(SUM(s.amount)) OVER (ORDER BY DATE_TRUNC('month', s.date))) / LAG(SUM(s.amount)) OVER (ORDER BY DATE_TRUNC('month', s.date))) * 100, 1) AS change
+FROM sales s
+WHERE s.date >= CURRENT_DATE - INTERVAL '6 months'
+GROUP BY DATE_TRUNC('month', s.date)
+ORDER BY month;`
+        }
+      ],
+      createdAt: '2025-08-11T14:15:00.000Z',
+      updatedAt: '2025-08-11T14:15:00.000Z',
+      isActive: false
+    }
+  ];
+
+  chatHistory = [
+    {
+      id: 'conv-1',
+      title: 'Top 5 customers by revenue',
+      time: 'Today, 3:42 PM',
+      active: true
+    },
+    {
+      id: 'conv-2',
+      title: 'Monthly sales trend analysis',
+      time: 'Today, 2:15 PM',
+      active: false
+    },
+    {
+      id: 'conv-3',
+      title: 'Product performance metrics',
+      time: 'Yesterday, 11:30 AM',
+      active: false
+    },
+    {
+      id: 'conv-4',
+      title: 'Regional sales comparison',
+      time: 'Aug 10, 2025',
+      active: false
+    },
+    {
+      id: 'conv-5',
+      title: 'Customer retention analysis',
+      time: 'Aug 10, 2025',
+      active: false
+    },
+    {
+      id: 'conv-6',
+      title: 'Quarterly revenue breakdown',
+      time: 'Aug 9, 2025',
+      active: false
+    },
+    {
+      id: 'conv-7',
+      title: 'Market share insights',
+      time: 'Aug 8, 2025',
+      active: false
+    },
+    {
+      id: 'conv-8',
+      title: 'Inventory turnover rates',
+      time: 'Aug 7, 2025',
+      active: false
+    }
+  ];
+
   logger.info('Demo data initialized');
 }
 
@@ -366,6 +516,8 @@ async function loadData() {
     const storedAgents = await dbManager.getAll('agents');
     const storedProviders = await dbManager.getAll('llmProviders');
     const storedDatastores = await dbManager.getAll('datastores');
+    const storedConversations = await dbManager.getAll('conversations');
+    const storedChatHistory = await dbManager.getAll('chatHistory');
 
     if (storedAgents.length > 0) {
       agents = storedAgents;
@@ -390,6 +542,22 @@ async function loadData() {
       initializeDemoData();
       await saveData();
     }
+
+    if (storedConversations.length > 0) {
+      conversations = storedConversations;
+      logger.info(`Loaded ${conversations.length} conversations from IndexedDB`);
+    } else {
+      initializeDemoData();
+      await saveData();
+    }
+
+    if (storedChatHistory.length > 0) {
+      chatHistory = storedChatHistory;
+      logger.info(`Loaded ${chatHistory.length} chat history items from IndexedDB`);
+    } else {
+      initializeDemoData();
+      await saveData();
+    }
   } catch (error) {
     logger.error('Failed to load data from IndexedDB, using demo data', error);
     initializeDemoData();
@@ -405,6 +573,8 @@ async function saveData() {
     await dbManager.clearStore('agents');
     await dbManager.clearStore('llmProviders');
     await dbManager.clearStore('datastores');
+    await dbManager.clearStore('conversations');
+    await dbManager.clearStore('chatHistory');
 
     // Save current data
     for (const agent of agents) {
@@ -417,6 +587,14 @@ async function saveData() {
 
     for (const datastore of datastores) {
       await dbManager.create('datastores', datastore);
+    }
+
+    for (const conversation of conversations) {
+      await dbManager.create('conversations', conversation);
+    }
+
+    for (const chat of chatHistory) {
+      await dbManager.create('chatHistory', chat);
     }
 
     logger.info('Data saved to IndexedDB');
@@ -861,6 +1039,192 @@ async function handleDatastores(request, url) {
   }
 }
 
+// Handle conversations
+async function handleConversations(request, url) {
+  const requestId = generateRequestId();
+  const method = request.method;
+  const pathParts = url.pathname.split('/');
+  const conversationId = pathParts[3];
+
+  try {
+    interceptRequest(request, requestId);
+
+    switch (method) {
+      case 'GET':
+        if (conversationId) {
+          const conversation = conversations.find(c => c.id === conversationId);
+          if (!conversation) {
+            const response = createErrorResponse('Conversation not found', 404, requestId);
+            interceptResponse(response, requestId);
+            return response;
+          }
+          const response = createResponse(conversation);
+          interceptResponse(response, requestId);
+          return response;
+        }
+        const listResponse = createResponse(conversations);
+        interceptResponse(listResponse, requestId);
+        return listResponse;
+
+      case 'POST':
+        const postData = await request.json().catch(error => {
+          throw new Error('Invalid JSON in request body');
+        });
+
+        const newConversation = {
+          id: generateId(),
+          ...postData,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          isActive: false
+        };
+
+        conversations.push(newConversation);
+        await saveData();
+
+        logger.info('Created new conversation', { id: newConversation.id, title: newConversation.title }, requestId);
+        const createdResponse = createResponse(newConversation, 201);
+        interceptResponse(createdResponse, requestId);
+        return createdResponse;
+
+      case 'PUT':
+        if (!conversationId) {
+          const response = createErrorResponse('Conversation ID required', 400, requestId);
+          interceptResponse(response, requestId);
+          return response;
+        }
+
+        const putData = await request.json().catch(error => {
+          throw new Error('Invalid JSON in request body');
+        });
+
+        const index = conversations.findIndex(c => c.id === conversationId);
+        if (index === -1) {
+          const response = createErrorResponse('Conversation not found', 404, requestId);
+          interceptResponse(response, requestId);
+          return response;
+        }
+
+        const updatedConversation = {
+          ...conversations[index],
+          ...putData,
+          id: conversationId,
+          updatedAt: new Date().toISOString()
+        };
+
+        conversations[index] = updatedConversation;
+        await saveData();
+
+        logger.info('Updated conversation', { id: conversationId, title: updatedConversation.title }, requestId);
+        const updatedResponse = createResponse(updatedConversation);
+        interceptResponse(updatedResponse, requestId);
+        return updatedResponse;
+
+      case 'DELETE':
+        if (!conversationId) {
+          const response = createErrorResponse('Conversation ID required', 400, requestId);
+          interceptResponse(response, requestId);
+          return response;
+        }
+
+        const deleteIndex = conversations.findIndex(c => c.id === conversationId);
+        if (deleteIndex === -1) {
+          const response = createErrorResponse('Conversation not found', 404, requestId);
+          interceptResponse(response, requestId);
+          return response;
+        }
+
+        const deletedConversation = conversations[deleteIndex];
+        conversations.splice(deleteIndex, 1);
+        await saveData();
+
+        logger.info('Deleted conversation', { id: conversationId, title: deletedConversation.title }, requestId);
+        const deletedResponse = createResponse({ success: true });
+        interceptResponse(deletedResponse, requestId);
+        return deletedResponse;
+
+      default:
+        const methodNotAllowedResponse = createErrorResponse('Method not allowed', 405, requestId);
+        interceptResponse(methodNotAllowedResponse, requestId);
+        return methodNotAllowedResponse;
+    }
+  } catch (error) {
+    logger.error('Error handling conversation request', error, requestId);
+    const response = createErrorResponse(`Internal server error: ${error.message}`, 500, requestId);
+    interceptResponse(response, requestId);
+    return response;
+  }
+}
+
+// Handle chat history
+async function handleChatHistory(request, url) {
+  const requestId = generateRequestId();
+  const method = request.method;
+
+  try {
+    interceptRequest(request, requestId);
+
+    switch (method) {
+      case 'GET':
+        const listResponse = createResponse(chatHistory);
+        interceptResponse(listResponse, requestId);
+        return listResponse;
+
+      case 'POST':
+        const postData = await request.json().catch(error => {
+          throw new Error('Invalid JSON in request body');
+        });
+
+        const newChatItem = {
+          id: generateId(),
+          ...postData,
+          active: false
+        };
+
+        chatHistory.push(newChatItem);
+        await saveData();
+
+        logger.info('Created new chat history item', { id: newChatItem.id, title: newChatItem.title }, requestId);
+        const createdResponse = createResponse(newChatItem, 201);
+        interceptResponse(createdResponse, requestId);
+        return createdResponse;
+
+      case 'PATCH':
+        const patchData = await request.json().catch(error => {
+          throw new Error('Invalid JSON in request body');
+        });
+
+        // Set all items to inactive
+        chatHistory.forEach(item => item.active = false);
+
+        // Set the specified item to active
+        if (patchData.activeId) {
+          const activeItem = chatHistory.find(item => item.id === patchData.activeId);
+          if (activeItem) {
+            activeItem.active = true;
+          }
+        }
+
+        await saveData();
+
+        logger.info('Updated chat history active state', { activeId: patchData.activeId }, requestId);
+        const patchResponse = createResponse(chatHistory);
+        interceptResponse(patchResponse, requestId);
+        return patchResponse;
+
+      default:
+        const methodNotAllowedResponse = createErrorResponse('Method not allowed', 405, requestId);
+        interceptResponse(methodNotAllowedResponse, requestId);
+        return methodNotAllowedResponse;
+    }
+  } catch (error) {
+    logger.error('Error handling chat history request', error, requestId);
+    const response = createErrorResponse(`Internal server error: ${error.message}`, 500, requestId);
+    interceptResponse(response, requestId);
+    return response;
+  }
+}
+
 // Handle validation endpoints
 async function handleValidation(request, url) {
   const requestId = generateRequestId();
@@ -927,6 +1291,8 @@ async function handleManagement(request, url) {
         agents = [];
         llmProviders = [];
         datastores = [];
+        conversations = [];
+        chatHistory = [];
         initializeDemoData();
         await saveData();
 
@@ -940,6 +1306,8 @@ async function handleManagement(request, url) {
         agents = [];
         llmProviders = [];
         datastores = [];
+        conversations = [];
+        chatHistory = [];
         initializeDemoData();
         await saveData();
 
@@ -1037,6 +1405,8 @@ self.addEventListener('message', async event => {
           agents = [];
           llmProviders = [];
           datastores = [];
+          conversations = [];
+          chatHistory = [];
           initializeDemoData();
           await saveData();
 
@@ -1063,6 +1433,8 @@ self.addEventListener('message', async event => {
           agents = [];
           llmProviders = [];
           datastores = [];
+          conversations = [];
+          chatHistory = [];
 
           logger.info('Cleared all data', null, requestId);
           event.source.postMessage({
@@ -1117,6 +1489,10 @@ self.addEventListener('fetch', event => {
     event.respondWith(handleLLMProviders(request, url));
   } else if (url.pathname.startsWith('/api/datastores')) {
     event.respondWith(handleDatastores(request, url));
+  } else if (url.pathname.startsWith('/api/conversations')) {
+    event.respondWith(handleConversations(request, url));
+  } else if (url.pathname.startsWith('/api/chat-history')) {
+    event.respondWith(handleChatHistory(request, url));
   } else if (url.pathname.startsWith('/api/validate')) {
     event.respondWith(handleValidation(request, url));
   } else if (url.pathname.startsWith('/api/management')) {

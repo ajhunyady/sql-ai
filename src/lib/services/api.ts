@@ -4,6 +4,12 @@
 import type { Agent, AgentFormData } from '$lib/models/agent';
 import type { LLMProvider, LLMProviderFormData } from '$lib/models/llm-provider';
 import type { Datastore, DatastoreFormData } from '$lib/models/datastore';
+import type {
+	Conversation,
+	ConversationFormData,
+	ChatHistoryItem,
+	ChatHistoryFormData
+} from '$lib/models/conversation';
 
 const API_BASE = '/api';
 
@@ -114,6 +120,47 @@ export const datastoreApi = {
 		apiRequest(`/validate/datastore/${datastore.id}`, {
 			method: 'POST',
 			body: JSON.stringify(datastore)
+		})
+};
+
+// Conversation API functions
+export const conversationApi = {
+	getAll: (): Promise<Conversation[]> => apiRequest('/conversations'),
+
+	getById: (id: string): Promise<Conversation> => apiRequest(`/conversations/${id}`),
+
+	create: (data: ConversationFormData): Promise<Conversation> =>
+		apiRequest('/conversations', {
+			method: 'POST',
+			body: JSON.stringify(data)
+		}),
+
+	update: (id: string, data: ConversationFormData): Promise<Conversation> =>
+		apiRequest(`/conversations/${id}`, {
+			method: 'PUT',
+			body: JSON.stringify(data)
+		}),
+
+	delete: (id: string): Promise<{ success: boolean }> =>
+		apiRequest(`/conversations/${id}`, {
+			method: 'DELETE'
+		})
+};
+
+// Chat History API functions
+export const chatHistoryApi = {
+	getAll: (): Promise<ChatHistoryItem[]> => apiRequest('/chat-history'),
+
+	create: (data: ChatHistoryFormData): Promise<ChatHistoryItem> =>
+		apiRequest('/chat-history', {
+			method: 'POST',
+			body: JSON.stringify(data)
+		}),
+
+	setActive: (activeId: string): Promise<ChatHistoryItem[]> =>
+		apiRequest('/chat-history', {
+			method: 'PATCH',
+			body: JSON.stringify({ activeId })
 		})
 };
 
