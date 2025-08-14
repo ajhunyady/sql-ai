@@ -971,7 +971,7 @@ async function handleManagement(request, url) {
 }
 
 // Handle messages from clients
-self.addEventListener('message', event => {
+self.addEventListener('message', async event => {
   const { type, payload } = event.data;
   const requestId = generateRequestId();
 
@@ -1029,6 +1029,56 @@ self.addEventListener('message', event => {
               timestamp: Date.now()
             });
           });
+        break;
+
+      case 'LOAD_SAMPLE_DATA':
+        try {
+          await dbManager.clearAll();
+          agents = [];
+          llmProviders = [];
+          datastores = [];
+          initializeDemoData();
+          await saveData();
+
+          logger.info('Loaded sample data', null, requestId);
+          event.source.postMessage({
+            type: 'sample-data-loaded',
+            success: true,
+            timestamp: Date.now()
+          });
+        } catch (error) {
+          logger.error('Failed to load sample data', error, requestId);
+          event.source.postMessage({
+            type: 'sample-data-loaded',
+            success: false,
+            error: error.message,
+            timestamp: Date.now()
+          });
+        }
+        break;
+
+      case 'CLEAR_DATA':
+        try {
+          await dbManager.clearAll();
+          agents = [];
+          llmProviders = [];
+          datastores = [];
+
+          logger.info('Cleared all data', null, requestId);
+          event.source.postMessage({
+            type: 'data-cleared',
+            success: true,
+            timestamp: Date.now()
+          });
+        } catch (error) {
+          logger.error('Failed to clear data', error, requestId);
+          event.source.postMessage({
+            type: 'data-cleared',
+            success: false,
+            error: error.message,
+            timestamp: Date.now()
+          });
+        }
         break;
 
       case 'SKIP_WAITING':
